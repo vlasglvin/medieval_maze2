@@ -2,6 +2,11 @@ from pygame import *
 init()
 WIDTH,HEIGHT = 1000,700
 FPS = 60
+BG_COLOR = (129, 161, 0)
+
+sprites = sprite.Group()
+
+
 
 
 class GameSprite(sprite.Sprite):
@@ -11,15 +16,37 @@ class GameSprite(sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = x,y
         self.mask = mask.from_surface(self.image)
+        sprites.add(self)
     
     def draw(self,window):
         window.blit(self.image,self.rect)
+
+    def update(self):
+        pass
 
 class Player(GameSprite):
     def __init__(self,sprite_image,x,y,width,height,speed,hp):
         super().__init__(sprite_image,x,y,width,height)
         self.speed = speed
         self.hp = hp
+
+    def update(self):
+        '''
+        movement control from keyboard
+        '''                
+        keys = key.get_pressed()
+
+        if keys[K_d] and self.rect.right < WIDTH:
+            self.rect.x += self.speed
+
+        if keys[K_a] and self.rect.left > 0:
+            self.rect.x -= self.speed
+
+        if keys[K_w] and self.rect.top > 0:
+            self.rect.y -= self.speed
+
+        if keys[K_s] and self.rect.bottom < HEIGHT:
+            self.rect.y += self.speed
 
 
 window = display.set_mode((WIDTH,HEIGHT))
@@ -33,7 +60,10 @@ while run:
     for e in event.get():
         if e.type == QUIT:
             run = False
-    player.draw(window)
+    window.fill(BG_COLOR)
+    sprites.draw(window)
+    sprites.update()
+
 
     display.update()
     clock.tick(FPS)
