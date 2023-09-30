@@ -1,10 +1,13 @@
 from pygame import *
+
 init()
 WIDTH,HEIGHT = 1000,700
 FPS = 60
 BG_COLOR = (129, 161, 0)
 
 sprites = sprite.Group()
+enemys = sprite.Sprite()
+walls = sprite.Sprite()
 
 
 
