@@ -1,14 +1,14 @@
 XXXXXXXXXXXXXXXXXXXX
 X                  X
-X                  X
+X              H    X
 X     E            X
 X                  X
 X              E   X
-X                  X
+X    H              X
 X                  X
 X    E             X
 X                  X
 X                  X
-X               P  X
+X       H        P  X
 X                  X
 XXXXXXXXXXXXXXXXXXXX

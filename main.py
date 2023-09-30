@@ -5,6 +5,7 @@ WIDTH,HEIGHT = 1000,700
 FPS = 60
 BG_COLOR = (129, 161, 0)
 
+potions = sprite.Group()
 sprites = sprite.Group()
 enemys = sprite.Group()
 walls = sprite.Group()
@@ -73,6 +74,9 @@ with open("level_1.txt",'r', encoding="utf-8") as file:
             
             if symbol == "E":
                 enemys.add(GameSprite("assets/enemy/skeleton.png" , x,y, 50,50))
+
+            if symbol == "H":
+                potions.add(GameSprite("assets/map/P_Medicine04.png" , x,y, 15,15))
 
             x += 50
 
