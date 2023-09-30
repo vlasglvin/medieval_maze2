@@ -60,12 +60,19 @@ run = True
 player  = Player("assets/frame_00_delay-0.12s.png",100,100,65,65,5,3)
 
 with open("level_1.txt",'r', encoding="utf-8") as file:
-    x, y = 0, 0
+    x, y = 0, 10
     map = file.readlines()
     for line in map:
         for symbol in line:
             if symbol == "X":
-                walls.add(GameSprite("assets/map/fence.png" , x,y, 50,50))
+                walls.add(GameSprite("assets/map/fence.png" , x,y, 50,25))
+            
+            if symbol == "P":
+                player.rect.x = x
+                player.rect.y = y
+            
+            if symbol == "E":
+                enemys.add(GameSprite("assets/enemy/skeleton.png" , x,y, 50,50))
 
             x += 50
 
