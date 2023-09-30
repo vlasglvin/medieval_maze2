@@ -6,8 +6,8 @@ FPS = 60
 BG_COLOR = (129, 161, 0)
 
 sprites = sprite.Group()
-enemys = sprite.Sprite()
-walls = sprite.Sprite()
+enemys = sprite.Group()
+walls = sprite.Group()
 
 
 
@@ -58,6 +58,19 @@ clock  = time.Clock()
 run = True
 
 player  = Player("assets/frame_00_delay-0.12s.png",100,100,65,65,5,3)
+
+with open("level_1.txt",'r', encoding="utf-8") as file:
+    x, y = 0, 0
+    map = file.readlines()
+    for line in map:
+        for symbol in line:
+            if symbol == "X":
+                walls.add(GameSprite("assets/map/fence.png" , x,y, 50,50))
+
+            x += 50
+
+        x = 0
+        y += 50
 
 while run:
     for e in event.get():
