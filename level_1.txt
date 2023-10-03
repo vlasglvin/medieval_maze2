@@ -1,14 +1,16 @@
-XXXXXXXXXXXXXXXXXXXX
-x   wwwwwwwwwwwww  x
-x           c  Hw  x
-x     E         w  x
-x   wwwwwwwwwwwww  x
-x              E   x
-x    H             x
-x                  x
-x    E        c    x
-x                  x
-x                  x
-x       H        P x
-x                  x
-XXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXX  XXXXXXXX
+x   wwwwwwwwwwwwwA   w   RSx
+x       R    C Gw    w   E x
+x     E        Gw    w     x
+x   wwwwwwwwwwwww    w     x
+x              Eww  ww  R  x
+x    H                     x
+x            wwwwwwwwww    x
+x    E        Cw     w     x
+xwwwwwwwwwww  www    w     x
+xGGG       E        www    x
+xwwwwwwwwwww  H wP  w      x
+x               w   w      x
+X     E             w      x
+x               R   w      x
+XXXXXXXXXXXXXXXXXXXXXXXXXXXX                          x

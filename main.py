@@ -1,7 +1,7 @@
 from pygame import *
 
 init()
-WIDTH,HEIGHT = 1000,700
+WIDTH,HEIGHT = 1400,800
 FPS = 60
 BG_COLOR = (129, 161, 0)
 
@@ -11,11 +11,15 @@ enemys = sprite.Group()
 walls = sprite.Group()
 chests = sprite.Group()
 
+arrow_image = image.load("assets/map/arrowSign.png")
+sword_image = image.load("assets/map/S_Sword09.png")
+goldbar_image = image.load("assets/map/I_GoldBar.png")
 player_image = image.load("assets/frame_00_delay-0.12s.png")
 fence_image = image.load("assets/map/fence.png")
 left_fence_image = transform.rotate(fence_image, 90)
 wall_image = image.load("assets/map/wall.png")
 skeleton_image = image.load("assets/enemy/skeleton.png")
+red_potion_image = image.load("assets/map/P_Red01.png")
 potion_image = image.load("assets/map/P_Medicine04.png")
 chest_image = image.load("assets/map/I_Chest01.png")
 
@@ -25,7 +29,7 @@ class GameSprite(sprite.Sprite):
         super().__init__()
         self.image = transform.scale(sprite_image, (width,height))
         self.rect = self.image.get_rect()
-        self.rect.x, self.rect.y = x,y
+        self.rect.centerx, self.rect.centery = x, y
         self.mask = mask.from_surface(self.image)
         sprites.add(self)
     
@@ -68,7 +72,7 @@ run = True
 player  = Player(player_image,100, 100, 65, 65, 5 ,3)
 
 with open("level_1.txt",'r', encoding="utf-8") as file:
-    x, y = 0, 10
+    x, y = 25, 25
     map = file.readlines()
     for line in map:
         for symbol in line:
@@ -92,10 +96,23 @@ with open("level_1.txt",'r', encoding="utf-8") as file:
                 walls.add(GameSprite(wall_image , x,y, 50,50))
 
             if symbol == "C":
-                chests.add(GameSprite(chest_image , x,y, 25,25))
+                chests.add(GameSprite(chest_image , x,y, 30,30))
+
+            if symbol == "R":
+                chests.add(GameSprite(red_potion_image , x,y, 15,15))
+
+            if symbol == "G":
+                chests.add(GameSprite(goldbar_image , x,y, 30,30))
+
+            if symbol == "S":
+                chests.add(GameSprite(sword_image , x,y, 30,30))
+
+            if symbol == "A":
+                chests.add(GameSprite(arrow_image , x,y, 50,50))
+
             x += 50
 
-        x = 0
+        x = 25
         y += 50
 
 while run:
