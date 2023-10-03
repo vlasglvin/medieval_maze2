@@ -10,13 +10,16 @@ sprites = sprite.Group()
 enemys = sprite.Group()
 walls = sprite.Group()
 
-
+player_image = image.load("assets/frame_00_delay-0.12s.png")
+fence_image = image.load("assets/map/fence.png")
+skeleton_image = image.load("assets/enemy/skeleton.png")
+potion_image = image.load("assets/map/P_Medicine04.png")
 
 
 class GameSprite(sprite.Sprite):
     def __init__(self,sprite_image,x,y,width,height):
         super().__init__()
-        self.image = transform.scale(image.load(sprite_image), (width,height))
+        self.image = transform.scale(sprite_image, (width,height))
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = x,y
         self.mask = mask.from_surface(self.image)
@@ -58,7 +61,7 @@ display.set_caption("Medieval Game")
 clock  = time.Clock()
 run = True
 
-player  = Player("assets/frame_00_delay-0.12s.png",100,100,65,65,5,3)
+player  = player_image
 
 with open("level_1.txt",'r', encoding="utf-8") as file:
     x, y = 0, 10
@@ -66,17 +69,17 @@ with open("level_1.txt",'r', encoding="utf-8") as file:
     for line in map:
         for symbol in line:
             if symbol == "X":
-                walls.add(GameSprite("assets/map/fence.png" , x,y, 50,25))
+                walls.add(GameSprite(fence_image , x,y, 50,25))
             
             if symbol == "P":
                 player.rect.x = x
                 player.rect.y = y
             
             if symbol == "E":
-                enemys.add(GameSprite("assets/enemy/skeleton.png" , x,y, 50,50))
+                enemys.add(GameSprite(skeleton_image , x,y, 50,50))
 
             if symbol == "H":
-                potions.add(GameSprite("assets/map/P_Medicine04.png" , x,y, 15,15))
+                potions.add(GameSprite(potion_image , x,y, 15,15))
 
             x += 50
 
@@ -90,7 +93,6 @@ while run:
     window.fill(BG_COLOR)
     sprites.draw(window)
     sprites.update()
-
 
     display.update()
     clock.tick(FPS)
