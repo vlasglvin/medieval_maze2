@@ -9,11 +9,15 @@ potions = sprite.Group()
 sprites = sprite.Group()
 enemys = sprite.Group()
 walls = sprite.Group()
+chests = sprite.Group()
 
 player_image = image.load("assets/frame_00_delay-0.12s.png")
 fence_image = image.load("assets/map/fence.png")
+left_fence_image = transform.rotate(fence_image, 90)
+wall_image = image.load("assets/map/wall.png")
 skeleton_image = image.load("assets/enemy/skeleton.png")
 potion_image = image.load("assets/map/P_Medicine04.png")
+chest_image = image.load("assets/map/I_Chest01.png")
 
 
 class GameSprite(sprite.Sprite):
@@ -61,7 +65,7 @@ display.set_caption("Medieval Game")
 clock  = time.Clock()
 run = True
 
-player  = player_image
+player  = Player(player_image,100, 100, 65, 65, 5 ,3)
 
 with open("level_1.txt",'r', encoding="utf-8") as file:
     x, y = 0, 10
@@ -81,6 +85,14 @@ with open("level_1.txt",'r', encoding="utf-8") as file:
             if symbol == "H":
                 potions.add(GameSprite(potion_image , x,y, 15,15))
 
+            if symbol == "x":
+                walls.add(GameSprite(left_fence_image , x,y, 25,50))
+
+            if symbol == "w":
+                walls.add(GameSprite(wall_image , x,y, 50,50))
+
+            if symbol == "C":
+                chests.add(GameSprite(chest_image , x,y, 25,25))
             x += 50
 
         x = 0

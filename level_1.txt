@@ -1,14 +1,14 @@
 XXXXXXXXXXXXXXXXXXXX
-X                  X
-X              H   X
-X     E            X
-X                  X
-X              E   X
-X    H             X
-X                  X
-X    E             X
-X                  X
-X                  X
-X       H        P X
-X                  X
+x   wwwwwwwwwwwww  x
+x           c  Hw  x
+x     E         w  x
+x   wwwwwwwwwwwww  x
+x              E   x
+x    H             x
+x                  x
+x    E        c    x
+x                  x
+x                  x
+x       H        P x
+x                  x
 XXXXXXXXXXXXXXXXXXXX
