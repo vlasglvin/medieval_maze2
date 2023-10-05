@@ -87,7 +87,7 @@ with open("level_1.txt",'r', encoding="utf-8") as file:
                 enemys.add(GameSprite(skeleton_image , x,y, 50,50))
 
             if symbol == "H":
-                potions.add(GameSprite(potion_image , x,y, 15,15))
+                potions.add(GameSprite(potion_image , x,y, 20,20))
 
             if symbol == "x":
                 walls.add(GameSprite(left_fence_image , x,y, 25,50))
@@ -99,7 +99,7 @@ with open("level_1.txt",'r', encoding="utf-8") as file:
                 chests.add(GameSprite(chest_image , x,y, 30,30))
 
             if symbol == "R":
-                chests.add(GameSprite(red_potion_image , x,y, 15,15))
+                chests.add(GameSprite(red_potion_image , x,y, 20,20))
 
             if symbol == "G":
                 chests.add(GameSprite(goldbar_image , x,y, 30,30))
