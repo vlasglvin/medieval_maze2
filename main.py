@@ -1,4 +1,6 @@
 from pygame import *
+import os
+
 
 init()
 
@@ -13,6 +15,18 @@ sword_unleash = mixer.Sound("assets/audio/sword.1.ogg")
 WIDTH,HEIGHT = 1400,800
 FPS = 60
 BG_COLOR = (129, 161, 0)
+PATH = os.getcwd()
+
+ASSETS_PATH = os.path.join(PATH, "assets")#game adress
+player_down_dir = os.path.join(ASSETS_PATH, "player_down")#assets folder adress
+player_down_walk_dir =  os.path.join(player_down_dir, "walking")
+pl_walk_down = os.listdir(player_down_walk_dir)#player down adress
+player_down_list = []
+
+for img in pl_walk_down:
+    player_down_list.append(image.load(os.path.join(player_down_walk_dir, img)))
+
+
 
 
 potions = sprite.Group()
@@ -55,8 +69,8 @@ class GameSprite(sprite.Sprite):
         pass
 
 class Player(GameSprite):
-    def __init__(self,sprite_image,x,y,width,height,speed,hp):
-        super().__init__("player",sprite_image,x,y,width,height)
+    def __init__(self,x,y,width,height,speed,hp):
+        super().__init__("player",player_down_list[0],x,y,width,height)
         self.speed = speed
         self.hp = hp
         self.gold = 0
@@ -113,7 +127,7 @@ display.set_caption("Medieval Game")
 clock  = time.Clock()
 run = True
 
-player  = Player(player_image,100, 100, 50, 50, 4 ,3)
+player  = Player(100, 100, 50, 50, 4 ,3)
 
 with open("level_1.txt",'r', encoding="utf-8") as file:
     x, y = 25, 25
