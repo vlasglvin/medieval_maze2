@@ -5,8 +5,10 @@ init()
 font.init()
 mixer.init()
 mixer.music.load("assets/audio/Loop_Minstrel_Dance.wav")
-mixer.music.play("assets/audio/Loop_Minstrel_Dance.wav")
+mixer_music.set_volume(0.2)
+mixer.music.play()
 coin_sound = mixer.Sound("assets/audio/coinsplash.ogg")
+sword_unleash = mixer.Sound("assets/audio/sword.1.ogg")
 
 WIDTH,HEIGHT = 1400,800
 FPS = 60
@@ -19,6 +21,8 @@ enemys = sprite.Group()
 walls = sprite.Group()
 chests = sprite.Group()
 gold_bars = sprite.Group()
+swords = sprite.Group()
+
 
 right_arrow_image = image.load("assets/map/arrowSign.png")
 left_arrow_image = transform.flip(right_arrow_image,True,False)
@@ -35,8 +39,9 @@ chest_image = image.load("assets/map/I_Chest01.png")
 
 
 class GameSprite(sprite.Sprite):
-    def __init__(self,sprite_image,x,y,width,height):
+    def __init__(self,type,sprite_image,x,y,width,height):
         super().__init__()
+        self.type = type
         self.image = transform.scale(sprite_image, (width,height))
         self.rect = self.image.get_rect()
         self.rect.centerx, self.rect.centery = x, y
@@ -51,12 +56,20 @@ class GameSprite(sprite.Sprite):
 
 class Player(GameSprite):
     def __init__(self,sprite_image,x,y,width,height,speed,hp):
-        super().__init__(sprite_image,x,y,width,height)
+        super().__init__("player",sprite_image,x,y,width,height)
         self.speed = speed
         self.hp = hp
         self.gold = 0
+        self.weapon = ""
+
 
     def check_collision(self):
+        
+        sword_list = sprite.spritecollide(self, swords, True, sprite.collide_mask)
+        for sword in sword_list:
+            self.weapon = "sword"
+            sword_unleash.play()
+        
         
         gold_list = sprite.spritecollide(self, gold_bars, True, sprite.collide_mask)
         for gold in gold_list:
@@ -108,41 +121,41 @@ with open("level_1.txt",'r', encoding="utf-8") as file:
     for line in map:
         for symbol in line:
             if symbol == "X":
-                walls.add(GameSprite(fence_image , x,y, 50,25))
+                walls.add(GameSprite("fence",fence_image , x,y, 50,25))
             
             if symbol == "P":
                 player.rect.x = x
                 player.rect.y = y
             
             if symbol == "E":
-                enemys.add(GameSprite(skeleton_image , x,y, 35,40))
+                enemys.add(GameSprite("enemy",skeleton_image , x,y, 35,40))
 
             if symbol == "H":
-                potions.add(GameSprite(potion_image , x,y, 20,20))
+                potions.add(GameSprite("healing potion",potion_image , x,y, 20,20))
 
             if symbol == "x":
-                walls.add(GameSprite(left_fence_image , x,y, 25,50))
+                walls.add(GameSprite("flip fence",left_fence_image , x,y, 25,50))
 
             if symbol == "w":
-                walls.add(GameSprite(wall_image , x,y, 50,50))
+                walls.add(GameSprite("wall",wall_image , x,y, 50,50))
 
             if symbol == "C":
-                chests.add(GameSprite(chest_image , x,y, 30,30))
+                chests.add(GameSprite("chest",chest_image , x,y, 30,30))
 
             if symbol == "R":
-                chests.add(GameSprite(red_potion_image , x,y, 20,20))
+                potions.add(GameSprite("rage potion",red_potion_image , x,y, 20,20))
 
             if symbol == "G":
-                gold_bars.add(GameSprite(goldbar_image , x,y, 30,30))
+                gold_bars.add(GameSprite("gold bar",goldbar_image , x,y, 30,30))
 
             if symbol == "S":
-                chests.add(GameSprite(sword_image , x,y, 30,30))
+                swords.add(GameSprite("sword",sword_image , x,y, 30,30))
 
             if symbol == "A":
-                walls.add(GameSprite(right_arrow_image , x,y, 50,50))
+                walls.add(GameSprite("arrow",right_arrow_image , x,y, 50,50))
 
             if symbol == "a":
-                walls.add(GameSprite(left_arrow_image , x,y, 50,50))
+                walls.add(GameSprite("arrow",left_arrow_image , x,y, 50,50))
 
             x += 50
 
