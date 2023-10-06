@@ -1,17 +1,27 @@
 from pygame import *
 
 init()
+
+font.init()
+mixer.init()
+mixer.music.load("assets/audio/Loop_Minstrel_Dance.wav")
+mixer.music.play("assets/audio/Loop_Minstrel_Dance.wav")
+coin_sound = mixer.Sound("assets/audio/coinsplash.ogg")
+
 WIDTH,HEIGHT = 1400,800
 FPS = 60
 BG_COLOR = (129, 161, 0)
+
 
 potions = sprite.Group()
 sprites = sprite.Group()
 enemys = sprite.Group()
 walls = sprite.Group()
 chests = sprite.Group()
+gold_bars = sprite.Group()
 
-arrow_image = image.load("assets/map/arrowSign.png")
+right_arrow_image = image.load("assets/map/arrowSign.png")
+left_arrow_image = transform.flip(right_arrow_image,True,False)
 sword_image = image.load("assets/map/S_Sword09.png")
 goldbar_image = image.load("assets/map/I_GoldBar.png")
 player_image = image.load("assets/frame_00_delay-0.12s.png")
@@ -44,13 +54,29 @@ class Player(GameSprite):
         super().__init__(sprite_image,x,y,width,height)
         self.speed = speed
         self.hp = hp
+        self.gold = 0
 
+    def check_collision(self):
+        
+        gold_list = sprite.spritecollide(self, gold_bars, True, sprite.collide_mask)
+        for gold in gold_list:
+            self.gold += 1
+            coin_sound.play()
+        
+ 
+        
+        collide_list = sprite.spritecollide(self, walls, False, sprite.collide_mask)
+        if len(collide_list) > 0:
+            return True
+        else:
+            return False
+    
     def update(self):
         '''
         movement control from keyboard
         '''                
         keys = key.get_pressed()
-
+        old_pos =  self.rect.x,self.rect.y
         if keys[K_d] and self.rect.right < WIDTH:
             self.rect.x += self.speed
 
@@ -63,13 +89,18 @@ class Player(GameSprite):
         if keys[K_s] and self.rect.bottom < HEIGHT:
             self.rect.y += self.speed
 
+        if old_pos[0] != self.rect.x or old_pos[1] != self.rect.y:
+            if self.check_collision():
+                self.rect.x,self.rect.y = old_pos
+
+
 
 window = display.set_mode((WIDTH,HEIGHT))
 display.set_caption("Medieval Game")
 clock  = time.Clock()
 run = True
 
-player  = Player(player_image,100, 100, 65, 65, 5 ,3)
+player  = Player(player_image,100, 100, 50, 50, 4 ,3)
 
 with open("level_1.txt",'r', encoding="utf-8") as file:
     x, y = 25, 25
@@ -84,7 +115,7 @@ with open("level_1.txt",'r', encoding="utf-8") as file:
                 player.rect.y = y
             
             if symbol == "E":
-                enemys.add(GameSprite(skeleton_image , x,y, 50,50))
+                enemys.add(GameSprite(skeleton_image , x,y, 35,40))
 
             if symbol == "H":
                 potions.add(GameSprite(potion_image , x,y, 20,20))
@@ -102,13 +133,16 @@ with open("level_1.txt",'r', encoding="utf-8") as file:
                 chests.add(GameSprite(red_potion_image , x,y, 20,20))
 
             if symbol == "G":
-                chests.add(GameSprite(goldbar_image , x,y, 30,30))
+                gold_bars.add(GameSprite(goldbar_image , x,y, 30,30))
 
             if symbol == "S":
                 chests.add(GameSprite(sword_image , x,y, 30,30))
 
             if symbol == "A":
-                chests.add(GameSprite(arrow_image , x,y, 50,50))
+                walls.add(GameSprite(right_arrow_image , x,y, 50,50))
+
+            if symbol == "a":
+                walls.add(GameSprite(left_arrow_image , x,y, 50,50))
 
             x += 50
 
