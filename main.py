@@ -18,13 +18,16 @@ BG_COLOR = (129, 161, 0)
 PATH = os.getcwd()
 
 ASSETS_PATH = os.path.join(PATH, "assets")#game adress
-player_down_dir = os.path.join(ASSETS_PATH, "player_down")#assets folder adress
-player_down_walk_dir =  os.path.join(player_down_dir, "walking")
-pl_walk_down = os.listdir(player_down_walk_dir)#player down adress
-player_down_list = []
 
-for img in pl_walk_down:
-    player_down_list.append(image.load(os.path.join(player_down_walk_dir, img)))
+def get_image_list(foldername):
+    path_dir = os.path.join(ASSETS_PATH, foldername)#assets folder adress
+    image_names = os.listdir(path_dir)#player down adress
+    image_list = []
+
+    for img in image_names:
+        image_list.append(image.load(os.path.join(path_dir, img)))
+
+    return image_list
 
 
 
@@ -51,6 +54,11 @@ red_potion_image = image.load("assets/map/P_Red01.png")
 potion_image = image.load("assets/map/P_Medicine04.png")
 chest_image = image.load("assets/map/I_Chest01.png")
 
+player_down_img = get_image_list("player_down" + os.sep + "walking")
+player_left_img = get_image_list("player_left" + os.sep + "walking")
+player_right_img = get_image_list("player_right" + os.sep + "walking")
+player_up_img = get_image_list("player_up" + os.sep + "walking")
+
 
 class GameSprite(sprite.Sprite):
     def __init__(self,type,sprite_image,x,y,width,height):
@@ -70,12 +78,26 @@ class GameSprite(sprite.Sprite):
 
 class Player(GameSprite):
     def __init__(self,x,y,width,height,speed,hp):
-        super().__init__("player",player_down_list[0],x,y,width,height)
+        super().__init__("player",player_down_img[0],x,y,width,height)
         self.speed = speed
         self.hp = hp
         self.gold = 0
         self.weapon = ""
+        self.down_img = player_down_img
+        self.dir = "down"
+        self.frame = 0
+        self.frame_max = 8
+        self.image_k = 0
 
+    def animate(self):
+        self.frame += 1
+        if self.frame == self.frame_max:
+            self_frame = 0
+            self.image_k += 1
+            if self.image_k > len(self.down_img):
+                self_image_k = 0
+            if self.dir == "down":
+                self.image = self.down_img[self_image_k]
 
     def check_collision(self):
         
@@ -106,19 +128,28 @@ class Player(GameSprite):
         old_pos =  self.rect.x,self.rect.y
         if keys[K_d] and self.rect.right < WIDTH:
             self.rect.x += self.speed
-
-        if keys[K_a] and self.rect.left > 0:
+            self.dir = "right"
+        elif keys[K_a] and self.rect.left > 0:
             self.rect.x -= self.speed
-
-        if keys[K_w] and self.rect.top > 0:
+            self.dir = "left"
+        elif keys[K_w] and self.rect.top > 0:
             self.rect.y -= self.speed
-
-        if keys[K_s] and self.rect.bottom < HEIGHT:
+            self.dir = "up"
+        elif keys[K_s] and self.rect.bottom < HEIGHT:
             self.rect.y += self.speed
+            self.dir = "down"
+        
+        else:
+            self.dir = "stop"
 
+        if self.dir != "stop":
+            self.animate()
+        
         if old_pos[0] != self.rect.x or old_pos[1] != self.rect.y:
             if self.check_collision():
                 self.rect.x,self.rect.y = old_pos
+
+
 
 
 
