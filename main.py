@@ -56,6 +56,7 @@ skeleton_image = image.load("assets/enemy/skeleton.png")
 red_potion_image = image.load("assets/map/P_Red01.png")
 potion_image = image.load("assets/map/P_Medicine04.png")
 chest_image = image.load("assets/map/I_Chest01.png")
+open_chest_image = image.load("assets/map/I_Chest02.png")
 
 player_down_img = get_image_list("player_down" + os.sep + "walking", 50, 50)
 player_left_img = get_image_list("player_left" + os.sep + "walking", 50, 50)
@@ -129,7 +130,6 @@ class Player(GameSprite):
             coin_sound.play()
         
  
-        
         collide_list = sprite.spritecollide(self, walls, False, sprite.collide_mask)
         if len(collide_list) > 0:
             return True
@@ -165,9 +165,16 @@ class Player(GameSprite):
             if self.check_collision():
                 self.rect.x,self.rect.y = old_pos
 
-
-
-
+class Chest(GameSprite):
+    def __init__(self,x,y,width,height,item):
+        super().__init__("chest", chest_image, [0],x,y,width,height)
+        self.open_image = transform.scale(open_chest_image, width, height)
+        self.item = item
+        self.opened = False
+    
+    def open(self):
+        self.open = True
+        self.image = self.open_image
 
 window = display.set_mode((WIDTH,HEIGHT))
 display.set_caption("Medieval Game")
