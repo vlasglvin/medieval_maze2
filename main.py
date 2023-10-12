@@ -19,13 +19,16 @@ PATH = os.getcwd()
 
 ASSETS_PATH = os.path.join(PATH, "assets")#game adress
 
-def get_image_list(foldername):
+def get_image_list(foldername, width, height):
     path_dir = os.path.join(ASSETS_PATH, foldername)#assets folder adress
     image_names = os.listdir(path_dir)#player down adress
     image_list = []
 
     for img in image_names:
-        image_list.append(image.load(os.path.join(path_dir, img)))
+        new_image = image.load(os.path.join(path_dir, img))
+        resize_image = transform.scale(new_image, (width, height))
+        image_list.append(resize_image)
+
 
     return image_list
 
@@ -54,16 +57,18 @@ red_potion_image = image.load("assets/map/P_Red01.png")
 potion_image = image.load("assets/map/P_Medicine04.png")
 chest_image = image.load("assets/map/I_Chest01.png")
 
-player_down_img = get_image_list("player_down" + os.sep + "walking")
-player_left_img = get_image_list("player_left" + os.sep + "walking")
-player_right_img = get_image_list("player_right" + os.sep + "walking")
-player_up_img = get_image_list("player_up" + os.sep + "walking")
+player_down_img = get_image_list("player_down" + os.sep + "walking", 50, 50)
+player_left_img = get_image_list("player_left" + os.sep + "walking", 50, 50)
+player_right_img = get_image_list("player_right" + os.sep + "walking", 50, 50)
+player_up_img = get_image_list("player_up" + os.sep + "walking", 50, 50)
 
 
 class GameSprite(sprite.Sprite):
     def __init__(self,type,sprite_image,x,y,width,height):
         super().__init__()
         self.type = type
+        self.width = width
+        self.height = height
         self.image = transform.scale(sprite_image, (width,height))
         self.rect = self.image.get_rect()
         self.rect.centerx, self.rect.centery = x, y
@@ -84,21 +89,32 @@ class Player(GameSprite):
         self.gold = 0
         self.weapon = ""
         self.down_img = player_down_img
+        self.right_img = player_right_img
+        self.left_img = player_left_img
+        self.up_img = player_up_img
         self.dir = "down"
         self.frame = 0
-        self.frame_max = 8
+        self.frame_max = 5
         self.image_k = 0
 
     def animate(self):
         self.frame += 1
         if self.frame == self.frame_max:
-            self_frame = 0
+            self.frame = 0
             self.image_k += 1
-            if self.image_k > len(self.down_img):
-                self_image_k = 0
+            if self.image_k >= len(self.down_img):
+                self.image_k = 0
             if self.dir == "down":
-                self.image = self.down_img[self_image_k]
-
+                self.image = self.down_img[self.image_k]
+            elif self.dir == "up":
+                self.image = self.up_img[self.image_k]
+            elif self.dir == "left":
+                self.image = self.left_img[self.image_k]
+            elif self.dir == "right":
+                self.image = self.right_img[self.image_k]
+            
+         
+            
     def check_collision(self):
         
         sword_list = sprite.spritecollide(self, swords, True, sprite.collide_mask)
