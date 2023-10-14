@@ -9,6 +9,9 @@ mixer.init()
 mixer.music.load("assets/audio/Loop_Minstrel_Dance.wav")
 mixer_music.set_volume(0.2)
 mixer.music.play()
+enemy_damaging_sound = mixer.Sound("assets/audio/ogre5.wav")
+potion_sound = mixer.Sound("assets/audio/bottle.wav")
+chest_sound = mixer.Sound("assets/audio/door.wav")
 coin_sound = mixer.Sound("assets/audio/coinsplash.ogg")
 sword_unleash = mixer.Sound("assets/audio/sword.1.ogg")
 
@@ -118,6 +121,13 @@ class Player(GameSprite):
             
     def check_collision(self):
         
+        
+
+        chest_list = sprite.spritecollide(self, chests, False, sprite.collide_mask)
+        for chest in chest_list:
+            if not chest.opened:
+                chest.open()
+        
         sword_list = sprite.spritecollide(self, swords, True, sprite.collide_mask)
         for sword in sword_list:
             self.weapon = "sword"
@@ -135,7 +145,8 @@ class Player(GameSprite):
             return True
         else:
             return False
-    
+        
+
     def update(self):
         '''
         movement control from keyboard
@@ -166,15 +177,20 @@ class Player(GameSprite):
                 self.rect.x,self.rect.y = old_pos
 
 class Chest(GameSprite):
-    def __init__(self,x,y,width,height,item):
-        super().__init__("chest", chest_image, [0],x,y,width,height)
-        self.open_image = transform.scale(open_chest_image, width, height)
-        self.item = item
+    def __init__(self,x,y,width,height):
+        super().__init__("chest", chest_image,x,y,width,height)
+        self.open_image = transform.scale(open_chest_image, (width, height))
+        self.item = None
         self.opened = False
     
     def open(self):
-        self.open = True
+        
+        self.opened = True
         self.image = self.open_image
+        chest_sound.play()
+
+        return self.item
+
 
 window = display.set_mode((WIDTH,HEIGHT))
 display.set_caption("Medieval Game")
@@ -208,7 +224,7 @@ with open("level_1.txt",'r', encoding="utf-8") as file:
                 walls.add(GameSprite("wall",wall_image , x,y, 50,50))
 
             if symbol == "C":
-                chests.add(GameSprite("chest",chest_image , x,y, 30,30))
+                chests.add(Chest(x,y, 30,30,))
 
             if symbol == "R":
                 potions.add(GameSprite("rage potion",red_potion_image , x,y, 20,20))
