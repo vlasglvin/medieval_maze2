@@ -1,5 +1,6 @@
 from pygame import *
 import os
+import random
 
 
 init()
@@ -49,6 +50,8 @@ gold_bars = sprite.Group()
 swords = sprite.Group()
 
 
+
+
 right_arrow_image = image.load("assets/map/arrowSign.png")
 left_arrow_image = transform.flip(right_arrow_image,True,False)
 sword_image = image.load("assets/map/S_Sword09.png")
@@ -62,6 +65,12 @@ red_potion_image = image.load("assets/map/P_Red01.png")
 potion_image = image.load("assets/map/P_Medicine04.png")
 chest_image = image.load("assets/map/I_Chest01.png")
 open_chest_image = image.load("assets/map/I_Chest02.png")
+bow_image = image.load("assets/map/W_Bow02.png")
+axe_image = image.load("assets/map/W_Axe009.png")
+orange_potion_image = image.load("assets/map/P_Orange02.png")
+dagger_image = image.load("assets/map/W_Dagger006.png")
+suriken_image = image.load("assets/map/W_Throw05.png")
+spike_image = image.load("assets/map/spike.png")
 
 player_down_img = get_image_list("player_down" + os.sep + "walking", 50, 50)
 player_left_img = get_image_list("player_left" + os.sep + "walking", 50, 50)
@@ -182,16 +191,25 @@ class Chest(GameSprite):
     def __init__(self,x,y,width,height):
         super().__init__("chest", chest_image,x,y,width,height)
         self.open_image = transform.scale(open_chest_image, (width, height))
-        self.item = None
+        rand_item = random.choice(list(item_list.keys()))
+        self.time = time.get_ticks()
+        self.item = rand_item
         self.opened = False
+        print(self.item)
     
     def open(self):
         
         self.opened = True
         self.image = self.open_image
         chest_sound.play()
-
+        inventar.append(self.item)
+        self.time = time.get_ticks()
         return self.item
+    
+    def update(self):
+        if self.opened == True:
+            if time.get_ticks() - self.time < 1000:
+                window.blit(item_list[self.item], (self.rect.x + -25,self.rect.top - 5))
 
 
 window = display.set_mode((WIDTH,HEIGHT))
@@ -200,6 +218,16 @@ clock  = time.Clock()
 run = True
 
 player  = Player(100, 100, 50, 50, 4 ,3)
+inventar = []
+
+
+item_list = {
+    "healing potion" : potion_image, "rage potion" : red_potion_image, "gold bar" : goldbar_image,"sword" : sword_image,
+    "bow" : bow_image, "dagger" : dagger_image, "suriken" : suriken_image, "axe" : axe_image,
+      "speed potion" : orange_potion_image
+}
+
+
 
 with open("level_1.txt",'r', encoding="utf-8") as file:
     x, y = 25, 25
