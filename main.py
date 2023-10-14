@@ -12,9 +12,11 @@ mixer.music.play()
 enemy_damaging_sound = mixer.Sound("assets/audio/ogre5.wav")
 potion_sound = mixer.Sound("assets/audio/bottle.wav")
 chest_sound = mixer.Sound("assets/audio/door.wav")
+chest_sound.set_volume(0.2)
 coin_sound = mixer.Sound("assets/audio/coinsplash.ogg")
+coin_sound.set_volume(0.3)
 sword_unleash = mixer.Sound("assets/audio/sword.1.ogg")
-
+sword_unleash.set_volume(0.1)
 WIDTH,HEIGHT = 1400,800
 FPS = 60
 BG_COLOR = (129, 161, 0)
