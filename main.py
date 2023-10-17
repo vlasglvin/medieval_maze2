@@ -229,7 +229,7 @@ item_list = {
 
 
 
-with open("level_1.txt",'r', encoding="utf-8") as file:
+with open("level_2.txt",'r', encoding="utf-8") as file:
     x, y = 25, 25
     map = file.readlines()
     for line in map:
