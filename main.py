@@ -2,6 +2,7 @@ from pygame import *
 import os
 import random
 
+from inventar import Inventar
 
 init()
 
@@ -218,7 +219,7 @@ clock  = time.Clock()
 run = True
 
 player  = Player(100, 100, 50, 50, 4 ,3)
-inventar = []
+inventar = Inventar()
 
 
 item_list = {
@@ -283,7 +284,7 @@ while run:
     window.fill(BG_COLOR)
     sprites.draw(window)
     sprites.update()
-
+    inventar.draw(window)
     display.update()
     clock.tick(FPS)
 
