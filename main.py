@@ -263,7 +263,7 @@ with open("level_2.txt",'r', encoding="utf-8") as file:
                 potions.add(GameSprite("rage potion",red_potion_image , x,y, 20,20))
 
             if symbol == "O":
-                potions.add(GameSprite("speed orange potion",orange_potion_image , x,y, 20,20))
+                potions.add(GameSprite("speed potion",orange_potion_image , x,y, 20,20))
 
             if symbol == "G":
                 gold_bars.add(GameSprite("gold bar",goldbar_image , x,y, 30,30))
