@@ -78,6 +78,12 @@ player_left_img = get_image_list("player_left" + os.sep + "walking", 50, 50)
 player_right_img = get_image_list("player_right" + os.sep + "walking", 50, 50)
 player_up_img = get_image_list("player_up" + os.sep + "walking", 50, 50)
 
+item_list = {
+    "healing potion" : potion_image, "rage potion" : red_potion_image, "gold bar" : goldbar_image,"sword" : sword_image,
+    "bow" : bow_image, "dagger" : dagger_image, "suriken" : suriken_image, "axe" : axe_image,
+      "speed potion" : orange_potion_image
+}
+
 
 class GameSprite(sprite.Sprite):
     def __init__(self,type,sprite_image,x,y,width,height):
@@ -133,7 +139,11 @@ class Player(GameSprite):
             
     def check_collision(self):
         
-        
+        potion_list = sprite.spritecollide(self, potions, True, sprite.collide_mask)
+        for potion in potion_list:
+            inventar.add_item(potion.type)
+
+
 
         chest_list = sprite.spritecollide(self, chests, False, sprite.collide_mask)
         for chest in chest_list:
@@ -203,7 +213,7 @@ class Chest(GameSprite):
         self.opened = True
         self.image = self.open_image
         chest_sound.play()
-        inventar.append(self.item)
+        inventar.add_item(self.item)
         self.time = time.get_ticks()
         return self.item
     
@@ -220,14 +230,6 @@ run = True
 
 player  = Player(100, 100, 50, 50, 4 ,3)
 inventar = Inventar()
-
-
-item_list = {
-    "healing potion" : potion_image, "rage potion" : red_potion_image, "gold bar" : goldbar_image,"sword" : sword_image,
-    "bow" : bow_image, "dagger" : dagger_image, "suriken" : suriken_image, "axe" : axe_image,
-      "speed potion" : orange_potion_image
-}
-
 
 
 with open("level_2.txt",'r', encoding="utf-8") as file:
@@ -260,6 +262,9 @@ with open("level_2.txt",'r', encoding="utf-8") as file:
             if symbol == "R":
                 potions.add(GameSprite("rage potion",red_potion_image , x,y, 20,20))
 
+            if symbol == "O":
+                potions.add(GameSprite("speed orange potion",orange_potion_image , x,y, 20,20))
+
             if symbol == "G":
                 gold_bars.add(GameSprite("gold bar",goldbar_image , x,y, 30,30))
 
@@ -281,10 +286,17 @@ while run:
     for e in event.get():
         if e.type == QUIT:
             run = False
+        if e.type == KEYDOWN:
+            if e.key == K_e:
+                if not inventar.is_open == True:
+                    inventar.is_open = True
+                else:
+                    inventar.is_open = False
+    
     window.fill(BG_COLOR)
     sprites.draw(window)
     sprites.update()
-    inventar.draw(window)
+    inventar.draw(window, item_list)
     display.update()
     clock.tick(FPS)
 
