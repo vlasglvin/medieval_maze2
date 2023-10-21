@@ -2,7 +2,7 @@ from pygame import *
 import os
 import random
 
-from inventar import Inventar
+from HUD import Inventar, Counter
 
 init()
 
@@ -19,7 +19,7 @@ coin_sound = mixer.Sound("assets/audio/coinsplash.ogg")
 coin_sound.set_volume(0.3)
 sword_unleash = mixer.Sound("assets/audio/sword.1.ogg")
 sword_unleash.set_volume(0.1)
-WIDTH,HEIGHT = 1400,800
+WIDTH,HEIGHT = 1400,830
 FPS = 60
 BG_COLOR = (129, 161, 0)
 PATH = os.getcwd()
@@ -53,6 +53,7 @@ swords = sprite.Group()
 
 
 
+heart_image = image.load("assets/heart pixel art 254x254.png")
 right_arrow_image = image.load("assets/map/arrowSign.png")
 left_arrow_image = transform.flip(right_arrow_image,True,False)
 sword_image = image.load("assets/map/S_Sword09.png")
@@ -228,9 +229,9 @@ display.set_caption("Medieval Game")
 clock  = time.Clock()
 run = True
 
-player  = Player(100, 100, 50, 50, 4 ,3)
+player  = Player(100, 100, 50, 50, 4 ,100)
 inventar = Inventar()
-
+hp_counter = Counter(player.hp, heart_image, 35,35,WIDTH - 150,HEIGHT - 40)
 
 with open("level_2.txt",'r', encoding="utf-8") as file:
     x, y = 25, 25
@@ -297,6 +298,7 @@ while run:
     sprites.draw(window)
     sprites.update()
     inventar.draw(window, item_list)
+    hp_counter.draw(window)
     display.update()
     clock.tick(FPS)
 
