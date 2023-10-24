@@ -77,8 +77,12 @@ spike_image = image.load("assets/map/spike.png")
 player_down_img = get_image_list("player_down" + os.sep + "walking", 50, 50)
 player_left_img = get_image_list("player_left" + os.sep + "walking", 50, 50)
 player_right_img = get_image_list("player_right" + os.sep + "walking", 50, 50)
-player_up_img = get_image_list("player_up" + os.sep + "walking", 50, 50)
+player_up_img = get_image_list("player_up" + os.sep + "walking", 50, 50)\
 
+enemy_down_img = get_image_list("enemy" + os.sep + "down", 50, 50)
+enemy_left_img = get_image_list("enemy" + os.sep + "left", 50, 50)
+enemy_right_img = get_image_list("enemy" + os.sep + "right", 50, 50)
+enemy_up_img = get_image_list("enemy" + os.sep + "up", 50, 50)
 item_list = {
     "healing potion" : potion_image, "rage potion" : red_potion_image, "gold bar" : goldbar_image,"sword" : sword_image,
     "bow" : bow_image, "dagger" : dagger_image, "suriken" : suriken_image, "axe" : axe_image,
@@ -160,6 +164,7 @@ class Player(GameSprite):
         gold_list = sprite.spritecollide(self, gold_bars, True, sprite.collide_mask)
         for gold in gold_list:
             self.gold += 1
+            gold_counter.update_value(self.gold)
             coin_sound.play()
         
  
@@ -200,6 +205,8 @@ class Player(GameSprite):
                 self.rect.x,self.rect.y = old_pos
 
 class Chest(GameSprite):
+
+
     def __init__(self,x,y,width,height):
         super().__init__("chest", chest_image,x,y,width,height)
         self.open_image = transform.scale(open_chest_image, (width, height))
@@ -223,7 +230,38 @@ class Chest(GameSprite):
             if time.get_ticks() - self.time < 1000:
                 window.blit(item_list[self.item], (self.rect.x + -25,self.rect.top - 5))
 
+class Enemy(GameSprite):
+    def __init__(self,x,y,width,height,speed,hp):
+        super().__init__("player",player_down_img[0],x,y,width,height)
+        self.speed = speed
+        self.hp = hp
+        self.gold = 0
+        self.weapon = ""
+        self.down_img = player_down_img
+        self.right_img = player_right_img
+        self.left_img = player_left_img
+        self.up_img = player_up_img
+        self.dir = "down"
+        self.frame = 0
+        self.frame_max = 5
+        self.image_k = 0
 
+    def animate(self):
+        self.frame += 1
+        if self.frame == self.frame_max:
+            self.frame = 0
+            self.image_k += 1
+            if self.image_k >= len(self.down_img):
+                self.image_k = 0
+            if self.dir == "down":
+                self.image = self.down_img[self.image_k]
+            elif self.dir == "up":
+                self.image = self.up_img[self.image_k]
+            elif self.dir == "left":
+                self.image = self.left_img[self.image_k]
+            elif self.dir == "right":
+                self.image = self.right_img[self.image_k]
+            
 window = display.set_mode((WIDTH,HEIGHT))
 display.set_caption("Medieval Game")
 clock  = time.Clock()
@@ -232,6 +270,7 @@ run = True
 player  = Player(100, 100, 50, 50, 4 ,100)
 inventar = Inventar()
 hp_counter = Counter(player.hp, heart_image, 35,35,WIDTH - 150,HEIGHT - 40)
+gold_counter = Counter(player.gold, goldbar_image, 35,35,WIDTH - 270,HEIGHT - 40)
 
 with open("level_2.txt",'r', encoding="utf-8") as file:
     x, y = 25, 25
@@ -299,6 +338,7 @@ while run:
     sprites.update()
     inventar.draw(window, item_list)
     hp_counter.draw(window)
+    gold_counter.draw(window)
     display.update()
     clock.tick(FPS)
 
