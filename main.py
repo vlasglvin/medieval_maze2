@@ -232,20 +232,20 @@ class Chest(GameSprite):
 
 class Enemy(GameSprite):
     def __init__(self,x,y,width,height,speed,hp):
-        super().__init__("player",player_down_img[0],x,y,width,height)
+        super().__init__("enemy",enemy_down_img[0],x,y,width,height)
         self.speed = speed
         self.hp = hp
-        self.gold = 0
-        self.weapon = ""
-        self.down_img = player_down_img
-        self.right_img = player_right_img
-        self.left_img = player_left_img
-        self.up_img = player_up_img
+        self.down_img = enemy_down_img
+        self.right_img = enemy_right_img
+        self.left_img = enemy_left_img
+        self.up_img = enemy_up_img
         self.dir = "down"
         self.frame = 0
-        self.frame_max = 5
+        self.frame_max = 10
         self.image_k = 0
 
+
+        
     def animate(self):
         self.frame += 1
         if self.frame == self.frame_max:
@@ -262,6 +262,12 @@ class Enemy(GameSprite):
             elif self.dir == "right":
                 self.image = self.right_img[self.image_k]
             
+    def update(self):
+        old_pos =  self.rect.x,self.rect.y
+        if self.dir == "down":
+            self.rect.y += self.speed
+
+        self.animate()
 window = display.set_mode((WIDTH,HEIGHT))
 display.set_caption("Medieval Game")
 clock  = time.Clock()
@@ -285,7 +291,7 @@ with open("level_2.txt",'r', encoding="utf-8") as file:
                 player.rect.y = y
             
             if symbol == "E":
-                enemys.add(GameSprite("enemy",skeleton_image , x,y, 35,40))
+                enemys.add(Enemy(x,y, 40,40,2 ,20))
 
             if symbol == "H":
                 potions.add(GameSprite("healing potion",potion_image , x,y, 20,20))
