@@ -1,16 +1,16 @@
 XXXXXXXXXXXXXXXXXXXXXXXXXXXX
-xGGG  s     R            OCx
+xGGG  s     R       E    OCx
 x    wwwwwwwwwwwwwwwwww    x
 x    w RH     Cw         wGx
 x  E  w   wwwwww     E   wGx
 x      w  w    w    wwww wGx
 x G   w  o   E   R     P wGx
 x G   w    www  H        wGx
-x G   w    wc            w x
-x    w    www  wwwwwww   w x
+x G   w    wc       E    w x
+x    w  E  www  wwwwwww  w x
 x E   w                 ww x
 x    w    w  C G    w E w  x
 x    w    wwwwwwwww     w Hx
-X    w   O             wwwwx
+X    w   O      E      wwwwx
 x c     H            A       
 XXXXXXXXXXXXXXXXXXXXXXXXXXXX

@@ -39,9 +39,6 @@ def get_image_list(foldername, width, height):
 
     return image_list
 
-
-
-
 potions = sprite.Group()
 sprites = sprite.Group()
 enemys = sprite.Group()
@@ -49,9 +46,6 @@ walls = sprite.Group()
 chests = sprite.Group()
 gold_bars = sprite.Group()
 swords = sprite.Group()
-
-
-
 
 heart_image = image.load("assets/heart pixel art 254x254.png")
 right_arrow_image = image.load("assets/map/arrowSign.png")
@@ -140,26 +134,21 @@ class Player(GameSprite):
             elif self.dir == "right":
                 self.image = self.right_img[self.image_k]
             
-         
-            
     def check_collision(self):
         
         potion_list = sprite.spritecollide(self, potions, True, sprite.collide_mask)
         for potion in potion_list:
             inventar.add_item(potion.type)
 
-
-
         chest_list = sprite.spritecollide(self, chests, False, sprite.collide_mask)
         for chest in chest_list:
             if not chest.opened:
                 chest.open()
-        
+    
         sword_list = sprite.spritecollide(self, swords, True, sprite.collide_mask)
         for sword in sword_list:
             self.weapon = "sword"
             sword_unleash.play()
-        
         
         gold_list = sprite.spritecollide(self, gold_bars, True, sprite.collide_mask)
         for gold in gold_list:
@@ -167,13 +156,16 @@ class Player(GameSprite):
             gold_counter.update_value(self.gold)
             coin_sound.play()
         
- 
+        enemy_list = sprite.spritecollide(self, walls, False, sprite.collide_mask)
+        for enemy in enemy_list:
+            self.hp -= 1
+            hp_counter.update_value(self.hp)
+            
         collide_list = sprite.spritecollide(self, walls, False, sprite.collide_mask)
         if len(collide_list) > 0:
             return True
         else:
             return False
-        
 
     def update(self):
         '''
@@ -240,12 +232,11 @@ class Enemy(GameSprite):
         self.left_img = enemy_left_img
         self.up_img = enemy_up_img
         self.dir = "down"
+        self.dir_list = ["down", "up", "right", "left"]
         self.frame = 0
         self.frame_max = 10
         self.image_k = 0
 
-
-        
     def animate(self):
         self.frame += 1
         if self.frame == self.frame_max:
@@ -266,9 +257,24 @@ class Enemy(GameSprite):
         old_pos =  self.rect.x,self.rect.y
         if self.dir == "down":
             self.rect.y += self.speed
-
+        if self.dir == "up":
+            self.rect.y -= self.speed
+        if self.dir == "right":
+            self.rect.x += self.speed
+        if self.dir == "left":
+            self.rect.x -= self.speed
+        
+        collide_list = sprite.spritecollide(self, walls, False,)
+        if len(collide_list) > 0 or  not window_rect.contains(self.rect):
+            self.rect.x,self.rect.y = old_pos
+            list_dir = self.dir_list.copy()  
+            list_dir.remove(self.dir)
+            self.dir = random.choice(list_dir)
+   
         self.animate()
+
 window = display.set_mode((WIDTH,HEIGHT))
+window_rect = Rect(0, 0, WIDTH, HEIGHT)
 display.set_caption("Medieval Game")
 clock  = time.Clock()
 run = True
@@ -347,4 +353,3 @@ while run:
     gold_counter.draw(window)
     display.update()
     clock.tick(FPS)
-
