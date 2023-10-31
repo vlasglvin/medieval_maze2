@@ -36,6 +36,11 @@ class Inventar(sprite.Sprite):
                     x = 0
             window.blit(self.surface, (0,500))
 
+    def select(self, x, y):
+        if self.is_open == True:
+            if x > 0 and x < 300 and y > 500 and y < 500 + INV_HEIGHT:
+                item_x, item_y = 0, 500
+
 
 class Counter():
     def __init__ (self,value, image, width, height, x, y):

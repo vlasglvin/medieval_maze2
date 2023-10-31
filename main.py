@@ -357,10 +357,15 @@ while run:
                 else:
                     inventar.is_open = False
     
+        if e.type == MOUSEBUTTONDOWN and inventar.is_open:
+            x, y = e.pos
+            inventar.select(x, y)
+    
     window.fill(BG_COLOR)
     sprites.draw(window)
     sprites.update()
     inventar.draw(window, item_list)
+    inventar.update()
     hp_counter.draw(window)
     gold_counter.draw(window)
     display.update()
