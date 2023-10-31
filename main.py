@@ -117,6 +117,7 @@ class Player(GameSprite):
         self.frame = 0
         self.frame_max = 5
         self.image_k = 0
+        self.collided = False
 
     def animate(self):
         self.frame += 1
@@ -133,7 +134,13 @@ class Player(GameSprite):
                 self.image = self.left_img[self.image_k]
             elif self.dir == "right":
                 self.image = self.right_img[self.image_k]
-            
+
+    def got_hit(self, damage = 10):
+        if  not self.collided == True:
+            self.hp -= damage
+            hp_counter.update_value(self.hp)
+            self.collided = True
+
     def check_collision(self):
         
         potion_list = sprite.spritecollide(self, potions, True, sprite.collide_mask)
@@ -156,13 +163,18 @@ class Player(GameSprite):
             gold_counter.update_value(self.gold)
             coin_sound.play()
         
-        enemy_list = sprite.spritecollide(self, walls, False, sprite.collide_mask)
-        for enemy in enemy_list:
-            self.hp -= 1
-            hp_counter.update_value(self.hp)
+        enemy_list = sprite.spritecollide(self, enemys, False, sprite.collide_mask)
+        if len(enemy_list) > 0:
+            self.got_hit()
+        else:
+            self.collided = False
+        
             
-        collide_list = sprite.spritecollide(self, walls, False, sprite.collide_mask)
-        if len(collide_list) > 0:
+        if len(enemy_list) == 0:
+            self.collided = False
+
+        collide_list = sprite.spritecollide(self, walls, False,sprite.collide_mask)
+        if len(collide_list)> 0:
             return True
         else:
             return False
@@ -192,9 +204,8 @@ class Player(GameSprite):
         if self.dir != "stop":
             self.animate()
         
-        if old_pos[0] != self.rect.x or old_pos[1] != self.rect.y:
-            if self.check_collision():
-                self.rect.x,self.rect.y = old_pos
+        if self.check_collision():
+            self.rect.x,self.rect.y = old_pos
 
 class Chest(GameSprite):
 
@@ -252,7 +263,8 @@ class Enemy(GameSprite):
                 self.image = self.left_img[self.image_k]
             elif self.dir == "right":
                 self.image = self.right_img[self.image_k]
-            
+            self.mask = mask.from_surface(self.image)
+
     def update(self):
         old_pos =  self.rect.x,self.rect.y
         if self.dir == "down":
@@ -297,7 +309,7 @@ with open("level_2.txt",'r', encoding="utf-8") as file:
                 player.rect.y = y
             
             if symbol == "E":
-                enemys.add(Enemy(x,y, 40,40,2 ,20))
+                enemys.add(Enemy(x,y, 40,40,1 ,20))
 
             if symbol == "H":
                 potions.add(GameSprite("healing potion",potion_image , x,y, 20,20))
