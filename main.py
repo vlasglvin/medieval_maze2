@@ -206,6 +206,15 @@ class Player(GameSprite):
         
         if self.check_collision():
             self.rect.x,self.rect.y = old_pos
+    def heal(self, amount = 50):
+        self.hp += 50
+        hp_counter.update_value(self.hp)
+
+    
+    def use_item(self, item_name):
+        if item_name == "healing potion":
+            self.heal()
+            potion_sound.play()
 
 class Chest(GameSprite):
 
@@ -359,8 +368,11 @@ while run:
     
         if e.type == MOUSEBUTTONDOWN and inventar.is_open:
             x, y = e.pos
-            inventar.select(x, y)
-    
+            selected_item = inventar.select(x, y)
+            
+            if selected_item:
+                player.use_item(selected_item)
+
     window.fill(BG_COLOR)
     sprites.draw(window)
     sprites.update()

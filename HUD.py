@@ -21,6 +21,11 @@ class Inventar(sprite.Sprite):
             if len(self.items) < 16:
                 self.items[item] = 1
     
+    def remove_item(self, item):
+        if item in self.items:
+            self.items[item] -= 1
+        if self.items[item]==0:
+            del self.items[item]
     def draw(self, window, item_list):
         if self.is_open:
             self.surface.blit(self.image, (0,0))
@@ -40,8 +45,17 @@ class Inventar(sprite.Sprite):
         if self.is_open == True:
             if x > 0 and x < 300 and y > 500 and y < 500 + INV_HEIGHT:
                 item_x, item_y = 0, 500
-
-
+                item_number = 0
+                for row in range(4):
+                    for col in range(4):
+                        item_rect = Rect(item_x, item_y, ITEM_WIDTH, ITEM_HEIGHT)
+                        if item_rect.collidepoint(x, y) and item_number < len(self.items):
+                            item = list(self.items.keys())[item_number]
+                            self.remove_item(item)
+                            return item
+                        item_number += 1
+                        item_x += ITEM_WIDTH
+                    item_y += ITEM_HEIGHT
 class Counter():
     def __init__ (self,value, image, width, height, x, y):
         self.font = font.Font(FONT_PATH, height)
