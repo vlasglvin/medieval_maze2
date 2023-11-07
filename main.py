@@ -70,10 +70,16 @@ dagger_image = image.load("assets/map/W_Dagger006.png")
 suriken_image = image.load("assets/map/W_Throw05.png")
 spike_image = image.load("assets/map/spike.png")
 
-player_down_img = get_image_list("player_down" + os.sep + "walking", 50, 50)
-player_left_img = get_image_list("player_left" + os.sep + "walking", 50, 50)
-player_right_img = get_image_list("player_right" + os.sep + "walking", 50, 50)
-player_up_img = get_image_list("player_up" + os.sep + "walking", 50, 50)\
+player_images = {}
+
+folders = ["player_down", "player_left", "player_right", "player_up"]
+for folder in folders:
+    player_images[folder] = {
+        "walking": get_image_list(folder + os.sep + "walking", 50, 50),
+        "bow": get_image_list(folder + os.sep + "bow", 50, 50),
+        "knife": get_image_list(folder + os.sep + "knife", 50, 50),
+        "spear": get_image_list(folder + os.sep + "spear", 50, 50),
+    }
 
 enemy_down_img = get_image_list("enemy" + os.sep + "down", 50, 50)
 enemy_left_img = get_image_list("enemy" + os.sep + "left", 50, 50)
@@ -105,17 +111,17 @@ class GameSprite(sprite.Sprite):
         pass
 
 class Player(GameSprite):
-    def __init__(self,x,y,width,height,speed,hp):
-        super().__init__("player",player_down_img[0],x,y,width,height)
+    def __init__(self, images, x,y,width,height,speed,hp):
+        super().__init__("player",images['player_down']["walking"][0],x,y,width,height)
         self.speed = speed
         self.hp = hp
         self.power = 10
         self.gold = 0
         self.weapon = ""
-        self.down_img = player_down_img
-        self.right_img = player_right_img
-        self.left_img = player_left_img
-        self.up_img = player_up_img
+        self.down_img = images['player_down']["walking"]
+        self.right_img = images['player_right']["walking"]
+        self.left_img = images['player_left']["walking"]
+        self.up_img = images['player_up']["walking"]
         self.dir = "down"
         self.frame = 0
         self.frame_max = 5
@@ -346,7 +352,7 @@ display.set_caption("Medieval Game")
 clock  = time.Clock()
 run = True
 
-player  = Player(100, 100, 50, 50, 4 ,100)
+player  = Player(player_images, 100, 100, 50, 50, 4 ,100)
 inventar = Inventar()
 hp_counter = Counter(player.hp, heart_image, 35,35,WIDTH - 150,HEIGHT - 40)
 gold_counter = Counter(player.gold, goldbar_image, 35,35,WIDTH - 270,HEIGHT - 40)
