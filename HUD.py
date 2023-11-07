@@ -63,6 +63,7 @@ class Counter():
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = x,y
         self.label = self.font.render(str(value), True, (255, 255, 255))
+        self.width, self.height = width, height
 
     def draw(self, window):
         window.blit(self.image, self.rect)
@@ -70,3 +71,6 @@ class Counter():
 
     def update_value(self, new_value):
         self.label = self.font.render(str(new_value), True, (255, 255, 255))
+
+    def update_image(self, new_image):
+        self.image = transform.scale(new_image, (self.width, self.height))

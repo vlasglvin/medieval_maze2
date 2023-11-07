@@ -47,6 +47,8 @@ chests = sprite.Group()
 gold_bars = sprite.Group()
 swords = sprite.Group()
 
+rage_power_sign = image.load("assets/S_Sword16.png")
+power_sign = image.load("assets/S_Sword21.png")
 heart_image = image.load("assets/heart pixel art 254x254.png")
 right_arrow_image = image.load("assets/map/arrowSign.png")
 left_arrow_image = transform.flip(right_arrow_image,True,False)
@@ -107,6 +109,7 @@ class Player(GameSprite):
         super().__init__("player",player_down_img[0],x,y,width,height)
         self.speed = speed
         self.hp = hp
+        self.power = 10
         self.gold = 0
         self.weapon = ""
         self.down_img = player_down_img
@@ -118,6 +121,10 @@ class Player(GameSprite):
         self.frame_max = 5
         self.image_k = 0
         self.collided = False
+        self.boosted = False
+        self.boosted_timer = None
+        self.speed_boosted = False
+        self.speed_boosted_timer = 0
 
     def animate(self):
         self.frame += 1
@@ -206,14 +213,53 @@ class Player(GameSprite):
         
         if self.check_collision():
             self.rect.x,self.rect.y = old_pos
+
+        if self.boosted:
+            now = time.get_ticks()
+            if now - self.boosted_timer > 10000:
+                self.power_booster(-30)
+
+        if self.speed_boosted:
+            now = time.get_ticks()
+            if now - self.speed_boosted_timer > 10000:
+                self.speed_booster(-5)
+
     def heal(self, amount = 50):
         self.hp += 50
         hp_counter.update_value(self.hp)
+
+
+    def power_booster(self, amount = 30):
+        self.power += amount
+        if amount > 0:
+            self.boosted = True
+            self.boosted_timer = time.get_ticks()
+            power_counter.update_image(rage_power_sign)
+        else:
+            self.boosted = False
+            power_counter.update_image(power_sign)
+        power_counter.update_value(self.power)
+        
+    def speed_booster(self, amount = 7):
+        self.speed += amount
+        if amount > 0:
+            self.speed_boosted = True
+            self.speed_boosted_timer = time.get_ticks()
+        else:
+            self.speed_boosted = False
 
     
     def use_item(self, item_name):
         if item_name == "healing potion":
             self.heal()
+            potion_sound.play()
+        
+        if item_name == "speed potion":
+            self.speed_booster(5)
+            potion_sound.play()
+        
+        if item_name == "rage potion":
+            self.power_booster(30)
             potion_sound.play()
 
 class Chest(GameSprite):
@@ -304,6 +350,7 @@ player  = Player(100, 100, 50, 50, 4 ,100)
 inventar = Inventar()
 hp_counter = Counter(player.hp, heart_image, 35,35,WIDTH - 150,HEIGHT - 40)
 gold_counter = Counter(player.gold, goldbar_image, 35,35,WIDTH - 270,HEIGHT - 40)
+power_counter = Counter(player.power, power_sign, 35,35, WIDTH - 380, HEIGHT - 40)
 
 with open("level_2.txt",'r', encoding="utf-8") as file:
     x, y = 25, 25
@@ -380,5 +427,6 @@ while run:
     inventar.update()
     hp_counter.draw(window)
     gold_counter.draw(window)
+    power_counter.draw(window)
     display.update()
     clock.tick(FPS)
