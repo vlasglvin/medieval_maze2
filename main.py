@@ -14,6 +14,7 @@ mixer.music.play()
 enemy_damaging_sound = mixer.Sound("assets/audio/ogre5.wav")
 potion_sound = mixer.Sound("assets/audio/bottle.wav")
 chest_sound = mixer.Sound("assets/audio/door.wav")
+bow_sound = mixer.Sound("assets\qubodup-wobble2.wav")
 chest_sound.set_volume(0.2)
 coin_sound = mixer.Sound("assets/audio/coinsplash.ogg")
 coin_sound.set_volume(0.3)
@@ -66,7 +67,7 @@ open_chest_image = image.load("assets/map/I_Chest02.png")
 bow_image = image.load("assets/map/W_Bow02.png")
 axe_image = image.load("assets/map/W_Axe009.png")
 orange_potion_image = image.load("assets/map/P_Orange02.png")
-dagger_image = image.load("assets/map/W_Dagger006.png")
+knife_image = image.load("assets/map/W_Dagger006.png")
 suriken_image = image.load("assets/map/W_Throw05.png")
 spike_image = image.load("assets/map/spike.png")
 
@@ -87,7 +88,7 @@ enemy_right_img = get_image_list("enemy" + os.sep + "right", 50, 50)
 enemy_up_img = get_image_list("enemy" + os.sep + "up", 50, 50)
 item_list = {
     "healing potion" : potion_image, "rage potion" : red_potion_image, "gold bar" : goldbar_image,"sword" : sword_image,
-    "bow" : bow_image, "dagger" : dagger_image, "suriken" : suriken_image, "axe" : axe_image,
+    "bow" : bow_image, "knife" : dagger_image, "suriken" : suriken_image, "axe" : axe_image,
       "speed potion" : orange_potion_image
 }
 
@@ -113,11 +114,13 @@ class GameSprite(sprite.Sprite):
 class Player(GameSprite):
     def __init__(self, images, x,y,width,height,speed,hp):
         super().__init__("player",images['player_down']["walking"][0],x,y,width,height)
+        self.images = images
         self.speed = speed
         self.hp = hp
         self.power = 10
         self.gold = 0
-        self.weapon = ""
+        self.weapon = None
+        self.hit_image = None
         self.down_img = images['player_down']["walking"]
         self.right_img = images['player_right']["walking"]
         self.left_img = images['player_left']["walking"]
@@ -167,6 +170,7 @@ class Player(GameSprite):
     
         sword_list = sprite.spritecollide(self, swords, True, sprite.collide_mask)
         for sword in sword_list:
+            inventar.add_item("sword")
             self.weapon = "sword"
             sword_unleash.play()
         
@@ -220,6 +224,9 @@ class Player(GameSprite):
         if self.check_collision():
             self.rect.x,self.rect.y = old_pos
 
+        if self.hit_image:
+            self.hit_animate()
+
         if self.boosted:
             now = time.get_ticks()
             if now - self.boosted_timer > 10000:
@@ -267,6 +274,34 @@ class Player(GameSprite):
         if item_name == "rage potion":
             self.power_booster(30)
             potion_sound.play()
+
+        if item_name == "bow":
+            self.weapon = "bow"
+            bow_sound.play()
+
+        if item_name == "knife":
+            self.weapon = "knife"
+            sword_unleash.play()
+
+        if item_name == "spear":
+            self.weapon = "spear"
+            bow_sound.play()
+
+        def hit_animate(self): 
+            self.frame += 1
+            if self.frame == self.frame_max:
+                self.frame = 0
+                self.image_k += 1
+                if self.image_k >= len(self.hit_images):
+                    self.hit_images = None
+                    
+                self.image = self.hit_image[self.image_k]
+
+         
+        def hit(self):
+            self.hit_image = self.images['player_'+self.dir][self.weapon]
+            self.frame = 0
+            self.image_k = 0
 
 class Chest(GameSprite):
 
@@ -419,6 +454,9 @@ while run:
                 else:
                     inventar.is_open = False
     
+                if e.key == K_f:
+                    player.hit()
+
         if e.type == MOUSEBUTTONDOWN and inventar.is_open:
             x, y = e.pos
             selected_item = inventar.select(x, y)
