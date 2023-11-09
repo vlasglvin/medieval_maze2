@@ -86,9 +86,10 @@ enemy_down_img = get_image_list("enemy" + os.sep + "down", 50, 50)
 enemy_left_img = get_image_list("enemy" + os.sep + "left", 50, 50)
 enemy_right_img = get_image_list("enemy" + os.sep + "right", 50, 50)
 enemy_up_img = get_image_list("enemy" + os.sep + "up", 50, 50)
+enemy_killing_img = get_image_list("enemy" + os.sep + "killing", 50, 50)
 item_list = {
     "healing potion" : potion_image, "rage potion" : red_potion_image, "gold bar" : goldbar_image,"sword" : sword_image,
-    "bow" : bow_image, "knife" : dagger_image, "suriken" : suriken_image, "axe" : axe_image,
+    "bow" : bow_image, "knife" : knife_image, "suriken" : suriken_image, "axe" : axe_image,
       "speed potion" : orange_potion_image
 }
 
@@ -126,6 +127,7 @@ class Player(GameSprite):
         self.left_img = images['player_left']["walking"]
         self.up_img = images['player_up']["walking"]
         self.dir = "down"
+        self.state = "stop"
         self.frame = 0
         self.frame_max = 5
         self.image_k = 0
@@ -205,20 +207,24 @@ class Player(GameSprite):
         if keys[K_d] and self.rect.right < WIDTH:
             self.rect.x += self.speed
             self.dir = "right"
+            self.state = "move"
         elif keys[K_a] and self.rect.left > 0:
             self.rect.x -= self.speed
             self.dir = "left"
+            self.state = "move"
         elif keys[K_w] and self.rect.top > 0:
             self.rect.y -= self.speed
             self.dir = "up"
+            self.state = "move"
         elif keys[K_s] and self.rect.bottom < HEIGHT:
             self.rect.y += self.speed
             self.dir = "down"
+            self.state = "move"
         
         else:
-            self.dir = "stop"
+            self.state = "stop"
 
-        if self.dir != "stop":
+        if self.state != "stop" and not self.hit_image:
             self.animate()
         
         if self.check_collision():
@@ -287,21 +293,22 @@ class Player(GameSprite):
             self.weapon = "spear"
             bow_sound.play()
 
-        def hit_animate(self): 
-            self.frame += 1
-            if self.frame == self.frame_max:
-                self.frame = 0
-                self.image_k += 1
-                if self.image_k >= len(self.hit_images):
-                    self.hit_images = None
-                    
+    def hit(self):
+        self.hit_image = self.images['player_'+self.dir][self.weapon]
+        self.frame = 0
+        self.image_k = 0
+
+    def hit_animate(self): 
+        self.frame += 1
+        if self.frame == self.frame_max:
+            self.frame = 0
+            self.image_k += 1
+            if self.image_k >= len(self.hit_image):
+                self.hit_image = None
+            else:     
                 self.image = self.hit_image[self.image_k]
 
-         
-        def hit(self):
-            self.hit_image = self.images['player_'+self.dir][self.weapon]
-            self.frame = 0
-            self.image_k = 0
+
 
 class Chest(GameSprite):
 
@@ -311,16 +318,19 @@ class Chest(GameSprite):
         self.open_image = transform.scale(open_chest_image, (width, height))
         rand_item = random.choice(list(item_list.keys()))
         self.time = time.get_ticks()
-        self.item = rand_item
+        self.item = "knife"
         self.opened = False
-        print(self.item)
     
     def open(self):
         
         self.opened = True
         self.image = self.open_image
         chest_sound.play()
-        inventar.add_item(self.item)
+        if self.item == "gold bar":
+            player.gold += 1
+            gold_counter.update_value(player.gold)
+        else:  
+            inventar.add_item(self.item)
         self.time = time.get_ticks()
         return self.item
     
@@ -338,6 +348,7 @@ class Enemy(GameSprite):
         self.right_img = enemy_right_img
         self.left_img = enemy_left_img
         self.up_img = enemy_up_img
+        self.killing_img = enemy_killing_img
         self.dir = "down"
         self.dir_list = ["down", "up", "right", "left"]
         self.frame = 0
@@ -359,6 +370,8 @@ class Enemy(GameSprite):
                 self.image = self.left_img[self.image_k]
             elif self.dir == "right":
                 self.image = self.right_img[self.image_k]
+            else:
+                self.image = self.killing_img[self.image_k]
             self.mask = mask.from_surface(self.image)
 
     def update(self):
@@ -371,15 +384,26 @@ class Enemy(GameSprite):
             self.rect.x += self.speed
         if self.dir == "left":
             self.rect.x -= self.speed
-        
+
+
+
         collide_list = sprite.spritecollide(self, walls, False,)
         if len(collide_list) > 0 or  not window_rect.contains(self.rect):
             self.rect.x,self.rect.y = old_pos
             list_dir = self.dir_list.copy()  
             list_dir.remove(self.dir)
             self.dir = random.choice(list_dir)
-   
+        
         self.animate()
+        self.check_collision(player)
+
+    def check_collision(self, player):
+        if sprite.collide_mask(self, player) and player.hit_image:
+            self.hp - player.power
+            if self.hp <= 0:
+                self.dir = "dead"
+
+
 
 window = display.set_mode((WIDTH,HEIGHT))
 window_rect = Rect(0, 0, WIDTH, HEIGHT)
@@ -454,8 +478,8 @@ while run:
                 else:
                     inventar.is_open = False
     
-                if e.key == K_f:
-                    player.hit()
+            if e.key == K_f:
+                player.hit()
 
         if e.type == MOUSEBUTTONDOWN and inventar.is_open:
             x, y = e.pos
