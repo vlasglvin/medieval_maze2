@@ -183,7 +183,7 @@ class Player(GameSprite):
             coin_sound.play()
         
         enemy_list = sprite.spritecollide(self, enemys, False, sprite.collide_mask)
-        if len(enemy_list) > 0:
+        if len(enemy_list) > 0 and not self.hit_image:
             self.got_hit()
         else:
             self.collided = False
@@ -360,8 +360,11 @@ class Enemy(GameSprite):
         if self.frame == self.frame_max:
             self.frame = 0
             self.image_k += 1
-            if self.image_k >= len(self.down_img):
+            if self.image_k >= len(self.down_img) and self.dir != "dead":
                 self.image_k = 0
+            if self.dir=="dead" and self.image_k >= len(self.killing_img):
+                self.kill()
+                return
             if self.dir == "down":
                 self.image = self.down_img[self.image_k]
             elif self.dir == "up":
@@ -394,14 +397,16 @@ class Enemy(GameSprite):
             list_dir.remove(self.dir)
             self.dir = random.choice(list_dir)
         
-        self.animate()
         self.check_collision(player)
+        self.animate()
 
     def check_collision(self, player):
         if sprite.collide_mask(self, player) and player.hit_image:
-            self.hp - player.power
+            self.hp -= player.power
             if self.hp <= 0:
                 self.dir = "dead"
+                self.image_k = 0
+                self.frame_max  = 5
 
 
 
