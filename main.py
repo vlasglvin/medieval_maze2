@@ -53,6 +53,7 @@ power_sign = image.load("assets/S_Sword21.png")
 heart_image = image.load("assets/heart pixel art 254x254.png")
 right_arrow_image = image.load("assets/map/arrowSign.png")
 left_arrow_image = transform.flip(right_arrow_image,True,False)
+spear_image = image.load("assets/map/W_Spear005.png")
 sword_image = image.load("assets/map/S_Sword09.png")
 goldbar_image = image.load("assets/map/I_GoldBar.png")
 player_image = image.load("assets/frame_00_delay-0.12s.png")
@@ -88,9 +89,8 @@ enemy_right_img = get_image_list("enemy" + os.sep + "right", 50, 50)
 enemy_up_img = get_image_list("enemy" + os.sep + "up", 50, 50)
 enemy_killing_img = get_image_list("enemy" + os.sep + "killing", 50, 50)
 item_list = {
-    "healing potion" : potion_image, "rage potion" : red_potion_image, "gold bar" : goldbar_image,"sword" : sword_image,
-    "bow" : bow_image, "knife" : knife_image, "suriken" : suriken_image, "axe" : axe_image,
-      "speed potion" : orange_potion_image
+    "healing potion" : potion_image, "rage potion" : red_potion_image, "gold bar" : goldbar_image,#"sword" : sword_image,
+    "bow" : bow_image, "knife" : knife_image,"spear" : spear_image,"speed potion" : orange_potion_image
 }
 
 
@@ -170,11 +170,10 @@ class Player(GameSprite):
             if not chest.opened:
                 chest.open()
     
-        sword_list = sprite.spritecollide(self, swords, True, sprite.collide_mask)
-        for sword in sword_list:
-            inventar.add_item("sword")
-            self.weapon = "sword"
-            sword_unleash.play()
+        # sword_list = sprite.spritecollide(self, swords, True, sprite.collide_mask)
+        # for sword in sword_list:
+        #     inventar.add_item("sword")
+        #     sword_unleash.play()
         
         gold_list = sprite.spritecollide(self, gold_bars, True, sprite.collide_mask)
         for gold in gold_list:
@@ -282,13 +281,18 @@ class Player(GameSprite):
             potion_sound.play()
 
         if item_name == "bow":
-            self.weapon = "bow"
+            if self.weapon:
+                inventar.add_item(self.weapon)
+            self.weapon == "bow"
             bow_sound.play()
+        
 
         if item_name == "knife":
-            self.weapon = "knife"
+            if self.weapon:
+                inventar.add_item(self.weapon)
+            self.weapon == "knife"
             sword_unleash.play()
-
+        
         if item_name == "spear":
             self.weapon = "spear"
             bow_sound.play()
@@ -318,7 +322,7 @@ class Chest(GameSprite):
         self.open_image = transform.scale(open_chest_image, (width, height))
         rand_item = random.choice(list(item_list.keys()))
         self.time = time.get_ticks()
-        self.item = "knife"
+        self.item = rand_item
         self.opened = False
     
     def open(self):
@@ -407,7 +411,7 @@ class Enemy(GameSprite):
                 self.dir = "dead"
                 self.image_k = 0
                 self.frame_max  = 5
-
+                self.frame = 0
 
 
 window = display.set_mode((WIDTH,HEIGHT))
@@ -458,8 +462,8 @@ with open("level_2.txt",'r', encoding="utf-8") as file:
             if symbol == "G":
                 gold_bars.add(GameSprite("gold bar",goldbar_image , x,y, 30,30))
 
-            if symbol == "S":
-                swords.add(GameSprite("sword",sword_image , x,y, 30,30))
+            # if symbol == "S":
+            #     swords.add(GameSprite("sword",sword_image , x,y, 30,30))
 
             if symbol == "A":
                 walls.add(GameSprite("arrow",right_arrow_image , x,y, 50,50))
