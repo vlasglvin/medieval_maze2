@@ -47,7 +47,9 @@ walls = sprite.Group()
 chests = sprite.Group()
 gold_bars = sprite.Group()
 swords = sprite.Group()
+arrows = sprite.Group()
 
+arrow_img = image.load("assets/arrow.png")
 rage_power_sign = image.load("assets/S_Sword16.png")
 power_sign = image.load("assets/S_Sword21.png")
 heart_image = image.load("assets/heart pixel art 254x254.png")
@@ -283,7 +285,7 @@ class Player(GameSprite):
         if item_name == "bow":
             if self.weapon:
                 inventar.add_item(self.weapon)
-            self.weapon == "bow"
+            self.weapon = "bow"
             bow_sound.play()
         
 
@@ -309,6 +311,7 @@ class Player(GameSprite):
             self.image_k += 1
             if self.image_k >= len(self.hit_image):
                 self.hit_image = None
+                arrows.add(Arrow(self.rect.x, self.rect.y, 5, self.dir))
             else:     
                 self.image = self.hit_image[self.image_k]
 
@@ -322,7 +325,7 @@ class Chest(GameSprite):
         self.open_image = transform.scale(open_chest_image, (width, height))
         rand_item = random.choice(list(item_list.keys()))
         self.time = time.get_ticks()
-        self.item = rand_item
+        self.item = "bow"
         self.opened = False
     
     def open(self):
@@ -412,6 +415,28 @@ class Enemy(GameSprite):
                 self.image_k = 0
                 self.frame_max  = 5
                 self.frame = 0
+
+class Arrow(GameSprite):
+    def __init__(self,x,y,speed,dir):
+        super().__init__("arrow",arrow_img,x,y,20,20)
+        self.speed = speed
+        self.dir = dir
+        if self.dir == "up":
+            self.image = transform.rotate(self.image, 90)
+        elif self.dir == "down":
+            self.image = transform.rotate(self.image, -90)
+        elif self.dir == "left":
+            self.image = transform.flip(self.image, False, True)
+    
+    def update(self):
+        if self.dir == "up":
+            self.rect.y -= self.speed
+        elif self.dir == "down":
+            self.rect.y += self.speed
+        elif self.dir == "right":
+            self.rect.x += self.speed
+        elif self.dir == "left":
+            self.rect.x -= self.speed
 
 
 window = display.set_mode((WIDTH,HEIGHT))
