@@ -275,7 +275,8 @@ class Player(GameSprite):
             potion_sound.play()
         
         if item_name == "speed potion":
-            self.speed_booster(5)
+            if not self.speed_boosted:
+                self.speed_booster(5)
             potion_sound.play()
         
         if item_name == "rage potion":
@@ -292,10 +293,12 @@ class Player(GameSprite):
         if item_name == "knife":
             if self.weapon:
                 inventar.add_item(self.weapon)
-            self.weapon == "knife"
+            self.weapon = "knife"
             sword_unleash.play()
         
         if item_name == "spear":
+            if self.weapon:
+                inventar.add_item(self.weapon)
             self.weapon = "spear"
             bow_sound.play()
 
@@ -311,7 +314,7 @@ class Player(GameSprite):
             self.image_k += 1
             if self.image_k >= len(self.hit_image):
                 self.hit_image = None
-                arrows.add(Arrow(self.rect.x, self.rect.y, 5, self.dir))
+                arrows.add(Arrow(self.rect, 5, self.dir))
             else:     
                 self.image = self.hit_image[self.image_k]
 
@@ -325,7 +328,7 @@ class Chest(GameSprite):
         self.open_image = transform.scale(open_chest_image, (width, height))
         rand_item = random.choice(list(item_list.keys()))
         self.time = time.get_ticks()
-        self.item = "bow"
+        self.item = rand_item
         self.opened = False
     
     def open(self):
@@ -408,7 +411,7 @@ class Enemy(GameSprite):
         self.animate()
 
     def check_collision(self, player):
-        if sprite.collide_mask(self, player) and player.hit_image:
+        if sprite.collide_mask(self, player) and player.hit_image and player.weapon != "bow":
             self.hp -= player.power
             if self.hp <= 0:
                 self.dir = "dead"
@@ -416,18 +419,35 @@ class Enemy(GameSprite):
                 self.frame_max  = 5
                 self.frame = 0
 
+        collide_list = sprite.spritecollide(self, arrows, True,)
+        for arrow in collide_list:
+            self.hp -= player.power
+            if self.hp <= 0:
+                self.dir = "dead"
+                self.image_k = 0
+                self.frame_max  = 5
+                self.frame = 0
+            
 class Arrow(GameSprite):
-    def __init__(self,x,y,speed,dir):
-        super().__init__("arrow",arrow_img,x,y,20,20)
-        self.speed = speed
+    def __init__(self,rect,speed,dir):
+        super().__init__("arrow",arrow_img,rect.x,rect.y,30,30)
+        self.speed = 8
         self.dir = dir
         if self.dir == "up":
             self.image = transform.rotate(self.image, 90)
+            self.rect.centerx = rect.centerx
+            self.rect.bottom = rect.top
         elif self.dir == "down":
             self.image = transform.rotate(self.image, -90)
+            self.rect.centerx = rect.centerx
+            self.rect.top = rect.bottom
         elif self.dir == "left":
             self.image = transform.flip(self.image, False, True)
-    
+            self.rect.right = rect.left
+            self.rect.centery = rect.centery
+        else:
+            self.rect.left = rect.right
+            self.rect.centery = rect.centery
     def update(self):
         if self.dir == "up":
             self.rect.y -= self.speed
@@ -437,6 +457,9 @@ class Arrow(GameSprite):
             self.rect.x += self.speed
         elif self.dir == "left":
             self.rect.x -= self.speed
+        collide_list = sprite.spritecollide(self, walls, False)
+        if len(collide_list) > 0:
+            self.kill()
 
 
 window = display.set_mode((WIDTH,HEIGHT))

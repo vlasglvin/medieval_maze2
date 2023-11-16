@@ -5,6 +5,8 @@ INV_WIDTH, INV_HEIGHT = 300,300
 ITEM_WIDTH, ITEM_HEIGHT = INV_WIDTH/4, INV_HEIGHT/4
 FONT_PATH = "assets/alagard_by_pix3m-d6awiwp.ttf"
 
+weapon_list = ["bow", "knife", "spear"]
+
 class Inventar(sprite.Sprite):
     def __init__(self):
         self.items = {}
@@ -15,7 +17,7 @@ class Inventar(sprite.Sprite):
         self.font = font.Font(FONT_PATH, 35)
     
     def add_item(self, item):
-        if item in self.items:
+        if item in self.items and not item in weapon_list:
             self.items[item] += 1
         else:
             if len(self.items) < 16:
