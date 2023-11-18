@@ -72,7 +72,7 @@ class Counter():
         window.blit(self.label, (self.rect.right + 15, self.rect.y))
 
     def update_value(self, new_value):
-        self.label = self.font.render(str(new_value), True, (255, 255, 255))
+        self.label = self.font.render(str(round(new_value)), True, (255, 255, 255))
 
     def update_image(self, new_image):
         self.image = transform.scale(new_image, (self.width, self.height))

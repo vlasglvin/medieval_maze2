@@ -122,6 +122,7 @@ class Player(GameSprite):
         self.images = images
         self.speed = speed
         self.hp = hp
+        self.min_speed = 2
         self.power = 10
         self.gold = 0
         self.weapon = None
@@ -140,6 +141,7 @@ class Player(GameSprite):
         self.boosted_timer = None
         self.speed_boosted = False
         self.speed_boosted_timer = 0
+        self.old_speed = speed
 
     def animate(self):
         self.frame += 1
@@ -160,8 +162,9 @@ class Player(GameSprite):
     def got_hit(self, damage = 10):
         if  not self.collided == True:
             self.hp -= damage
-            hp_counter.update_value(self.hp)
+            hp_counter.update_value(round(self.hp))
             self.collided = True
+            guy_dying.play()
 
     def check_collision(self):
         
@@ -174,11 +177,10 @@ class Player(GameSprite):
             if not chest.opened:
                 chest.open()
     
-        # sword_list = sprite.spritecollide(self, swords, True, sprite.collide_mask)
-        # for sword in sword_list:
-        #     inventar.add_item("sword")
-        #     sword_unleash.play()
-        
+        spike_list = sprite.spritecollide(self, spikes, False, sprite.collide_mask)
+        if len(spike_list) > 0:
+            self.got_hit(0.1)
+
         gold_list = sprite.spritecollide(self, gold_bars, True, sprite.collide_mask)
         for gold in gold_list:
             self.gold += 1
@@ -245,6 +247,14 @@ class Player(GameSprite):
             now = time.get_ticks()
             if now - self.speed_boosted_timer > 10000:
                 self.speed_booster(-5)
+
+
+        elif self.hp <= 50 and self.speed != self.min_speed:
+            self.old_speed = self.speed
+            self.speed = self.min_speed
+        else:
+            self.speed = self.old_speed
+
 
     def heal(self, amount = 50):
         self.hp += 50
