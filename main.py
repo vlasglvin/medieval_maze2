@@ -11,10 +11,11 @@ mixer.init()
 mixer.music.load("assets/audio/Loop_Minstrel_Dance.wav")
 mixer_music.set_volume(0.2)
 mixer.music.play()
+guy_dying = mixer.Sound("assets/dying_guy.ogg")
 enemy_damaging_sound = mixer.Sound("assets/audio/ogre5.wav")
 potion_sound = mixer.Sound("assets/audio/bottle.wav")
 chest_sound = mixer.Sound("assets/audio/door.wav")
-bow_sound = mixer.Sound("assets\qubodup-wobble2.wav")
+bow_sound = mixer.Sound("assets/qubodup-wobble2.wav")
 chest_sound.set_volume(0.2)
 coin_sound = mixer.Sound("assets/audio/coinsplash.ogg")
 coin_sound.set_volume(0.3)
@@ -48,6 +49,7 @@ chests = sprite.Group()
 gold_bars = sprite.Group()
 swords = sprite.Group()
 arrows = sprite.Group()
+spikes = sprite.Group()
 
 arrow_img = image.load("assets/arrow.png")
 rage_power_sign = image.load("assets/S_Sword16.png")
@@ -497,6 +499,11 @@ with open("level_2.txt",'r', encoding="utf-8") as file:
 
             if symbol == "w":
                 walls.add(GameSprite("wall",wall_image , x,y, 50,50))
+
+            if symbol == "S":
+                new_spike = GameSprite("spike",spike_image , x,y, 35,35)
+                spikes.add(new_spike)
+                walls.add(new_spike)
 
             if symbol == "C":
                 chests.add(Chest(x,y, 30,30,))
