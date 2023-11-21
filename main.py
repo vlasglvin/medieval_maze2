@@ -489,7 +489,7 @@ power_counter = Counter(player.power, power_sign, 35,35, WIDTH - 380, HEIGHT - 4
 
 level = "level_1.txt"
 
-with open("underground_tunels",'r', encoding="utf-8") as file:
+with open("level_3.txt",'r', encoding="utf-8") as file:
     #if level == "underground_tunels.txt":
     #BG_COLOR = (34, 36, 34)
     x, y = 25, 25
