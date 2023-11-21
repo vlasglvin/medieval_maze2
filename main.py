@@ -9,6 +9,7 @@ init()
 font.init()
 mixer.init()
 mixer.music.load("assets/audio/Loop_Minstrel_Dance.wav")
+#mixer.music.load("assets/Overture.ogg")
 mixer_music.set_volume(0.2)
 mixer.music.play()
 guy_dying = mixer.Sound("assets/dying_guy.ogg")
@@ -486,7 +487,11 @@ hp_counter = Counter(player.hp, heart_image, 35,35,WIDTH - 150,HEIGHT - 40)
 gold_counter = Counter(player.gold, goldbar_image, 35,35,WIDTH - 270,HEIGHT - 40)
 power_counter = Counter(player.power, power_sign, 35,35, WIDTH - 380, HEIGHT - 40)
 
-with open("level_2.txt",'r', encoding="utf-8") as file:
+level = "level_1.txt"
+
+with open("underground_tunels",'r', encoding="utf-8") as file:
+    #if level == "underground_tunels.txt":
+    #BG_COLOR = (34, 36, 34)
     x, y = 25, 25
     map = file.readlines()
     for line in map:
