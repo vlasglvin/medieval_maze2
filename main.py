@@ -9,7 +9,6 @@ init()
 font.init()
 mixer.init()
 mixer.music.load("assets/audio/Loop_Minstrel_Dance.wav")
-#mixer.music.load("assets/Overture.ogg")
 mixer_music.set_volume(0.2)
 mixer.music.play()
 guy_dying = mixer.Sound("assets/dying_guy.ogg")
@@ -210,19 +209,19 @@ class Player(GameSprite):
         '''                
         keys = key.get_pressed()
         old_pos =  self.rect.x,self.rect.y
-        if keys[K_d] and self.rect.right < WIDTH:
+        if keys[K_d]:
             self.rect.x += self.speed
             self.dir = "right"
             self.state = "move"
-        elif keys[K_a] and self.rect.left > 0:
+        elif keys[K_a]:
             self.rect.x -= self.speed
             self.dir = "left"
             self.state = "move"
-        elif keys[K_w] and self.rect.top > 0:
+        elif keys[K_w]:
             self.rect.y -= self.speed
             self.dir = "up"
             self.state = "move"
-        elif keys[K_s] and self.rect.bottom < HEIGHT:
+        elif keys[K_s]:
             self.rect.y += self.speed
             self.dir = "down"
             self.state = "move"
@@ -479,7 +478,7 @@ window = display.set_mode((WIDTH,HEIGHT))
 window_rect = Rect(0, 0, WIDTH, HEIGHT)
 display.set_caption("Medieval Game")
 clock  = time.Clock()
-run = True
+
 
 player  = Player(player_images, 100, 100, 50, 50, 4 ,100)
 inventar = Inventar()
@@ -489,91 +488,122 @@ power_counter = Counter(player.power, power_sign, 35,35, WIDTH - 380, HEIGHT - 4
 
 level = "level_1.txt"
 
-with open("level_3.txt",'r', encoding="utf-8") as file:
-    #if level == "underground_tunels.txt":
-    #BG_COLOR = (34, 36, 34)
-    x, y = 25, 25
-    map = file.readlines()
-    for line in map:
-        for symbol in line:
-            if symbol == "X":
-                walls.add(GameSprite("fence",fence_image , x,y, 50,25))
-            
-            if symbol == "P":
-                player.rect.x = x
-                player.rect.y = y
-            
-            if symbol == "E":
-                enemys.add(Enemy(x,y, 40,40,1 ,20))
+class GameController:
+    def __init__(self, level=1):
+        self.level = level
+        self.running = True
+        self.read_map()
 
-            if symbol == "H":
-                potions.add(GameSprite("healing potion",potion_image , x,y, 20,20))
+    def read_map(self):
+        global BG_COLOR
+        with open(f"level_{self.level}.txt",'r', encoding="utf-8") as file:
+            if self.level == 4:
+                BG_COLOR = (34, 36, 34)
+                mixer.music.load("assets/Overture.ogg")
+                mixer.music.play()
 
-            if symbol == "x":
-                walls.add(GameSprite("flip fence",left_fence_image , x,y, 25,50))
+            x, y = 25, 25
+            map = file.readlines()
+            for line in map:
+                for symbol in line:
+                    if symbol == "X":
+                        walls.add(GameSprite("fence",fence_image , x,y, 50,25))
+                    
+                    if symbol == "P":
+                        player.rect.x = x
+                        player.rect.y = y
+                    
+                    if symbol == "E":
+                        enemys.add(Enemy(x,y, 40,40,1 ,20))
 
-            if symbol == "w":
-                walls.add(GameSprite("wall",wall_image , x,y, 50,50))
+                    if symbol == "H":
+                        potions.add(GameSprite("healing potion",potion_image , x,y, 20,20))
 
-            if symbol == "S":
-                new_spike = GameSprite("spike",spike_image , x,y, 35,35)
-                spikes.add(new_spike)
-                walls.add(new_spike)
+                    if symbol == "x":
+                        walls.add(GameSprite("flip fence",left_fence_image , x,y, 25,50))
 
-            if symbol == "C":
-                chests.add(Chest(x,y, 30,30,))
+                    if symbol == "w":
+                        walls.add(GameSprite("wall",wall_image , x,y, 50,50))
 
-            if symbol == "R":
-                potions.add(GameSprite("rage potion",red_potion_image , x,y, 20,20))
+                    if symbol == "S":
+                        new_spike = GameSprite("spike",spike_image , x,y, 35,35)
+                        spikes.add(new_spike)
+                        walls.add(new_spike)
 
-            if symbol == "O":
-                potions.add(GameSprite("speed potion",orange_potion_image , x,y, 20,20))
+                    if symbol == "C":
+                        chests.add(Chest(x,y, 30,30,))
 
-            if symbol == "G":
-                gold_bars.add(GameSprite("gold bar",goldbar_image , x,y, 30,30))
+                    if symbol == "R":
+                        potions.add(GameSprite("rage potion",red_potion_image , x,y, 20,20))
 
-            # if symbol == "S":
-            #     swords.add(GameSprite("sword",sword_image , x,y, 30,30))
+                    if symbol == "O":
+                        potions.add(GameSprite("speed potion",orange_potion_image , x,y, 20,20))
 
-            if symbol == "A":
-                walls.add(GameSprite("arrow",right_arrow_image , x,y, 50,50))
+                    if symbol == "G":
+                        gold_bars.add(GameSprite("gold bar",goldbar_image , x,y, 30,30))
 
-            if symbol == "a":
-                walls.add(GameSprite("arrow",left_arrow_image , x,y, 50,50))
+                    # if symbol == "S":
+                    #     swords.add(GameSprite("sword",sword_image , x,y, 30,30))
 
-            x += 50
+                    if symbol == "A":
+                        walls.add(GameSprite("arrow",right_arrow_image , x,y, 50,50))
 
-        x = 25
-        y += 50
+                    if symbol == "a":
+                        walls.add(GameSprite("arrow",left_arrow_image , x,y, 50,50))
 
-while run:
-    for e in event.get():
-        if e.type == QUIT:
-            run = False
-        if e.type == KEYDOWN:
-            if e.key == K_e:
-                if not inventar.is_open == True:
-                    inventar.is_open = True
-                else:
-                    inventar.is_open = False
+                    x += 50
+
+                x = 25
+                y += 50
     
-            if e.key == K_f:
-                player.hit()
+    def events(self):
+        for e in event.get():
+            if e.type == QUIT:
+                self.running = False
+            if e.type == KEYDOWN:
+                if e.key == K_e:
+                    if not inventar.is_open == True:
+                        inventar.is_open = True
+                    else:
+                        inventar.is_open = False
+        
+                if e.key == K_f:
+                    player.hit()
 
-        if e.type == MOUSEBUTTONDOWN and inventar.is_open:
-            x, y = e.pos
-            selected_item = inventar.select(x, y)
-            
-            if selected_item:
-                player.use_item(selected_item)
+            if e.type == MOUSEBUTTONDOWN and inventar.is_open:
+                x, y = e.pos
+                selected_item = inventar.select(x, y)
+                
+                if selected_item:
+                    player.use_item(selected_item)
 
-    window.fill(BG_COLOR)
-    sprites.draw(window)
-    sprites.update()
-    inventar.draw(window, item_list)
-    inventar.update()
-    hp_counter.draw(window)
-    gold_counter.draw(window)
-    power_counter.draw(window)
-    display.update()
-    clock.tick(FPS)
+    def update(self):
+        window.fill(BG_COLOR)
+        sprites.draw(window)
+        sprites.update()
+        inventar.draw(window, item_list)
+        inventar.update()
+        hp_counter.draw(window)
+        gold_counter.draw(window)
+        power_counter.draw(window)
+        display.update()
+        clock.tick(FPS)
+
+    def next_level(self):
+        global player    
+        self.level += 1
+        for sprite in sprites:
+            sprite.kill()
+        player  = Player(player_images, 100, 100, 50, 50, 4 ,100)
+        self.read_map()
+
+    def run(self):
+        while self.running:
+            self.events()
+            self.update()
+            if not player.rect.colliderect(window_rect):
+                self.next_level()
+                
+
+game = GameController()
+game.run()
