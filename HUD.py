@@ -9,6 +9,7 @@ weapon_list = ["bow", "knife", "spear"]
 
 class Inventar(sprite.Sprite):
     def __init__(self):
+        super().__init__()
         self.items = {}
         self.items_images = []
         self.surface = Surface((INV_WIDTH, INV_HEIGHT))
@@ -76,3 +77,17 @@ class Counter():
 
     def update_image(self, new_image):
         self.image = transform.scale(new_image, (self.width, self.height))
+
+class Label:
+    def __init__(self, text, x ,y,font_size = 30, color = (255, 255, 255)):
+        self.font = font.Font(FONT_PATH, font_size)
+        self.image = self.font.render(text, True, color)
+        self.rect = self.image.get_rect()
+        self.rect.centerx, self.rect.centery = x, y
+        self.color = color
+
+    def draw(self, window):
+        window.blit(self.image, self.rect)
+    
+    def set_text(self, new_text):
+        self.image = self.font.render(new_text, True, self.color)

@@ -2,7 +2,7 @@ from pygame import *
 import os
 import random
 
-from HUD import Inventar, Counter
+from HUD import Inventar, Counter, Label
 
 init()
 
@@ -24,7 +24,9 @@ sword_unleash.set_volume(0.1)
 WIDTH,HEIGHT = 1400,830
 FPS = 60
 BG_COLOR = (129, 161, 0)
+RED = (143, 11, 11)
 PATH = os.getcwd()
+MAX_LEVEL = 4
 
 ASSETS_PATH = os.path.join(PATH, "assets")#game adress
 
@@ -492,7 +494,12 @@ class GameController:
     def __init__(self, level=1):
         self.level = level
         self.running = True
+        self.pause = False
+        self.game_over = False
+        self.result = Label("GAME OVER", WIDTH/2, HEIGHT/2, 100, RED)
         self.read_map()
+
+        
 
     def read_map(self):
         global BG_COLOR
@@ -570,6 +577,9 @@ class GameController:
                 if e.key == K_f:
                     player.hit()
 
+                if e.key == K_ESCAPE:
+                    self.pause = not self.pause
+
             if e.type == MOUSEBUTTONDOWN and inventar.is_open:
                 x, y = e.pos
                 selected_item = inventar.select(x, y)
@@ -577,33 +587,55 @@ class GameController:
                 if selected_item:
                     player.use_item(selected_item)
 
+            
+
     def update(self):
+        if player.hp <= 0:
+            self.game_over = True
+        sprites.update()
+        inventar.update()
+
+    def draw(self):
+        
+        if player.hp <= 0:
+            self.game_over = True
+        
         window.fill(BG_COLOR)
         sprites.draw(window)
-        sprites.update()
         inventar.draw(window, item_list)
-        inventar.update()
         hp_counter.draw(window)
         gold_counter.draw(window)
         power_counter.draw(window)
+        
+        if self.game_over:
+            self.result.draw(window)
+        
         display.update()
         clock.tick(FPS)
 
     def next_level(self):
         global player    
         self.level += 1
+        if self.level == MAX_LEVEL:
+            return 0
         for sprite in sprites:
             sprite.kill()
         player  = Player(player_images, 100, 100, 50, 50, 4 ,100)
         self.read_map()
+        return self.level
 
     def run(self):
         while self.running:
             self.events()
-            self.update()
+            if not self.game_over and not self.pause:
+                self.update()
             if not player.rect.colliderect(window_rect):
-                self.next_level()
+                if not self.next_level():
+                    self.result.set_text("YOU WIN")
+                    self.game_over = True
+
                 
+            self.draw()
 
 game = GameController()
 game.run()
