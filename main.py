@@ -2,15 +2,12 @@ from pygame import *
 import os
 import random
 
-from HUD import Inventar, Counter, Label
+from HUD import Inventar, Counter, Label, MainMenu
 
 init()
 
 font.init()
 mixer.init()
-mixer.music.load("assets/audio/Loop_Minstrel_Dance.wav")
-mixer_music.set_volume(0.2)
-mixer.music.play()
 guy_dying = mixer.Sound("assets/dying_guy.ogg")
 enemy_damaging_sound = mixer.Sound("assets/audio/ogre5.wav")
 potion_sound = mixer.Sound("assets/audio/bottle.wav")
@@ -494,12 +491,40 @@ class GameController:
     def __init__(self, level=1):
         self.level = level
         self.running = True
-        self.pause = False
+        self.pause = True
         self.game_over = False
         self.result = Label("GAME OVER", WIDTH/2, HEIGHT/2, 100, RED)
-        self.read_map()
+        self.menu = MainMenu(WIDTH, HEIGHT)
+        self.show_menu()
+        #self.read_map()
 
+    
+    def show_menu(self):
+        mixer.music.load("assets/audio/Woodland Fantasy.mp3")
+        mixer_music.set_volume(0.2)
+        mixer.music.play()
+        self.run_menu()
+
+    def start_game(self):
+        mixer.music.load("assets/audio/Loop_Minstrel_Dance.wav")
+        mixer_music.set_volume(0.2)
+        mixer.music.play()
+        self.read_map()
+        self.run()
+    
+    
+    
+    def run_menu(self):
         
+        while self.running:
+            for e in event.get():
+                if e.type == QUIT:
+                    self.running = False
+            
+            self.menu.draw(window)
+            display.update()
+            clock.tick(FPS)
+
 
     def read_map(self):
         global BG_COLOR
@@ -638,4 +663,4 @@ class GameController:
             self.draw()
 
 game = GameController()
-game.run()
+#game.run()

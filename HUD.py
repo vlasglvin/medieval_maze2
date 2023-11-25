@@ -6,6 +6,7 @@ ITEM_WIDTH, ITEM_HEIGHT = INV_WIDTH/4, INV_HEIGHT/4
 FONT_PATH = "assets/alagard_by_pix3m-d6awiwp.ttf"
 
 weapon_list = ["bow", "knife", "spear"]
+menu_bg = image.load("assets/parchment_alpha.png")
 
 class Inventar(sprite.Sprite):
     def __init__(self):
@@ -91,3 +92,17 @@ class Label:
     
     def set_text(self, new_text):
         self.image = self.font.render(new_text, True, self.color)
+
+
+class MainMenu(Surface):
+    def __init__(self, width, height):
+        super().__init__((width, height))
+        self.image = transform.scale(menu_bg, (width, height))
+        self.bg_color = (129, 161, 0)
+        self.width = width
+        self.height = height
+
+    def draw(self, window):
+        self.fill(self.bg_color)
+        self.blit(self.image, (0,0))
+        window.blit(self, (0,0))
