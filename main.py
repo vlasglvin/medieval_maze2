@@ -2,6 +2,7 @@ from pygame import *
 import os
 import random
 
+from config import *
 from HUD import Inventar, Counter, Label, MainMenu
 
 init()
@@ -18,14 +19,7 @@ coin_sound = mixer.Sound("assets/audio/coinsplash.ogg")
 coin_sound.set_volume(0.3)
 sword_unleash = mixer.Sound("assets/audio/sword.1.ogg")
 sword_unleash.set_volume(0.1)
-WIDTH,HEIGHT = 1400,830
-FPS = 60
-BG_COLOR = (129, 161, 0)
-RED = (143, 11, 11)
-PATH = os.getcwd()
-MAX_LEVEL = 4
 
-ASSETS_PATH = os.path.join(PATH, "assets")#game adress
 
 def get_image_list(foldername, width, height):
     path_dir = os.path.join(ASSETS_PATH, foldername)#assets folder adress

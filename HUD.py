@@ -1,12 +1,14 @@
 from pygame import *
 font.init()
 
+from config import *
 INV_WIDTH, INV_HEIGHT = 300,300
 ITEM_WIDTH, ITEM_HEIGHT = INV_WIDTH/4, INV_HEIGHT/4
 FONT_PATH = "assets/alagard_by_pix3m-d6awiwp.ttf"
 
 weapon_list = ["bow", "knife", "spear"]
 menu_bg = image.load("assets/parchment_alpha.png")
+menu_btn = image.load("assets/menu_button.png")
 
 class Inventar(sprite.Sprite):
     def __init__(self):
@@ -93,6 +95,24 @@ class Label:
     def set_text(self, new_text):
         self.image = self.font.render(new_text, True, self.color)
 
+class Button(sprite.Sprite):
+    def __init__(self, text, action, x, y, width=298, height=71, font_size = 30):
+        super().__init__()
+        self.font = font.Font(FONT_PATH, font_size)
+        self.image = transform.scale(menu_btn, (width, height))
+        self.rect = self.image.get_rect()
+        self.rect.centerx, self.rect.centery = x,y
+        self.label = self.font.render(str(text), True, (32, 34, 36))
+        self.label_rect = self.label.get_rect(center=(self.rect.centerx, self.rect.centery))
+        self.width, self.height = width, height
+        self.action = action
+
+    def draw(self, window):
+        window.blit(self.image, self.rect)
+        window.blit(self.label, self.label_rect)
+
+    def check_click(self):
+        pass
 
 class MainMenu(Surface):
     def __init__(self, width, height):
@@ -101,8 +121,17 @@ class MainMenu(Surface):
         self.bg_color = (129, 161, 0)
         self.width = width
         self.height = height
+        self.main_text = Label("Medieval Maze", WIDTH/2, 100, 100, (133, 77, 32))
+        self.options = [Button("Play", "start", WIDTH/2, 250, width=400, height=93, font_size = 50),
+                        Button("New Game", "start", WIDTH/2, 360),
+                        Button("About", "start", WIDTH/2, 460),
+                        Button("Exit", quit, WIDTH/2, 560)]
 
     def draw(self, window):
         self.fill(self.bg_color)
         self.blit(self.image, (0,0))
         window.blit(self, (0,0))
+        self.main_text.draw(window)
+        for btn in self.options:
+            btn.draw(window)
+       
