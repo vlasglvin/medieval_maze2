@@ -7,7 +7,7 @@ ITEM_WIDTH, ITEM_HEIGHT = INV_WIDTH/4, INV_HEIGHT/4
 FONT_PATH = "assets/alagard_by_pix3m-d6awiwp.ttf"
 
 weapon_list = ["bow", "knife", "spear"]
-menu_bg = image.load("assets/parchment_alpha.png")
+menu_bg = image.load("assets/shadowed_bg.png")
 menu_btn = image.load("assets/menu_button.png")
 
 class Inventar(sprite.Sprite):
@@ -111,20 +111,20 @@ class Button(sprite.Sprite):
         window.blit(self.image, self.rect)
         window.blit(self.label, self.label_rect)
 
-    def check_click(self):
-        pass
+    
 
 class MainMenu(Surface):
-    def __init__(self, width, height):
+    def __init__(self, width, height, game):
         super().__init__((width, height))
+        self.game = game
         self.image = transform.scale(menu_bg, (width, height))
-        self.bg_color = (129, 161, 0)
+        self.bg_color = (45, 117, 64)
         self.width = width
         self.height = height
-        self.main_text = Label("Medieval Maze", WIDTH/2, 100, 100, (133, 77, 32))
-        self.options = [Button("Play", "start", WIDTH/2, 250, width=400, height=93, font_size = 50),
-                        Button("New Game", "start", WIDTH/2, 360),
-                        Button("About", "start", WIDTH/2, 460),
+        self.main_text = Label("Medieval Maze", WIDTH/2, 150, 100, (133, 77, 32))
+        self.options = [Button("Play", self.game.start_game, WIDTH/2, 250, width=400, height=93, font_size = 50),
+                        Button("New Game", self.game.start_game, WIDTH/2, 360),
+                        Button("About", quit, WIDTH/2, 460),
                         Button("Exit", quit, WIDTH/2, 560)]
 
     def draw(self, window):
@@ -135,3 +135,14 @@ class MainMenu(Surface):
         for btn in self.options:
             btn.draw(window)
        
+    def check_click(self, x, y):
+        for btn in self.options:
+            if btn.rect.collidepoint(x, y):
+                btn.action()
+                return True
+        return False
+    
+class PauseMenu(MainMenu):
+    def __init__(self, width, height, game):
+        super().__init__(width, height, game)
+        self.image = transform.scale(menu_bg, (width, height))
