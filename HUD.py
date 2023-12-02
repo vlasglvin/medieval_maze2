@@ -115,9 +115,10 @@ class Button(sprite.Sprite):
 
 class MainMenu(Surface):
     def __init__(self, width, height, game):
-        super().__init__((width, height))
+        super().__init__((width, height), SRCALPHA, 32)
         self.game = game
-        self.image = transform.scale(menu_bg, (width, height))
+        self.image = transform.scale(menu_bg.convert_alpha(), (width, height))
+        self.rect = self.image.get_rect(center=(WIDTH/2, HEIGHT/2))
         self.bg_color = (45, 117, 64)
         self.width = width
         self.height = height
@@ -130,7 +131,7 @@ class MainMenu(Surface):
     def draw(self, window):
         self.fill(self.bg_color)
         self.blit(self.image, (0,0))
-        window.blit(self, (0,0))
+        window.blit(self, self.rect)
         self.main_text.draw(window)
         for btn in self.options:
             btn.draw(window)
@@ -145,4 +146,13 @@ class MainMenu(Surface):
 class PauseMenu(MainMenu):
     def __init__(self, width, height, game):
         super().__init__(width, height, game)
-        self.image = transform.scale(menu_bg, (width, height))
+        self.image = transform.scale(menu_bg.convert_alpha(), (width, height))
+        self.rect = self.image.get_rect(center=(WIDTH/2, HEIGHT/2))
+        self.options = [Button("Resume", self.game.resume, WIDTH/2, 360, width=250, height=60, font_size= 25),
+                        Button("Save Game", self.game.start_game, WIDTH/2, 410,  width=250, height=60, font_size= 25),
+                        Button("Main Menu", self.game.run_menu, WIDTH/2, 460,  width=250, height=60, font_size= 25)]
+        
+    def draw(self, window):
+        window.blit(self.image, self.rect)
+        for btn in self.options:
+            btn.draw(window)

@@ -3,7 +3,7 @@ import os
 import random
 
 from config import *
-from HUD import Inventar, Counter, Label, MainMenu
+from HUD import Inventar, Counter, Label, MainMenu, PauseMenu
 
 init()
 
@@ -43,6 +43,8 @@ gold_bars = sprite.Group()
 swords = sprite.Group()
 arrows = sprite.Group()
 spikes = sprite.Group()
+
+groups_list = [potions, enemys, walls, chests, gold_bars, swords, arrows, spikes]
 
 arrow_img = image.load("assets/arrow.png")
 rage_power_sign = image.load("assets/S_Sword16.png")
@@ -489,6 +491,7 @@ class GameController:
         self.game_over = False
         self.result = Label("GAME OVER", WIDTH/2, HEIGHT/2, 100, RED)
         self.menu = MainMenu(WIDTH, HEIGHT, self)
+        self.pause_menu = PauseMenu(WIDTH/3, HEIGHT/3, self)
         self.show_menu()
         #self.read_map()
 
@@ -531,6 +534,9 @@ class GameController:
 
     def read_map(self):
         global BG_COLOR
+        for group in groups_list:
+            group.empty()
+
         with open(f"level_{self.level}.txt",'r', encoding="utf-8") as file:
             if self.level == 4:
                 BG_COLOR = (34, 36, 34)
@@ -597,7 +603,7 @@ class GameController:
                 self.running = False
             if e.type == KEYDOWN:
                 if e.key == K_e:
-                    if not inventar.is_open == True:
+                    if not inventar.is_open == True and not self.pause:
                         inventar.is_open = True
                     else:
                         inventar.is_open = False
@@ -608,6 +614,11 @@ class GameController:
                 if e.key == K_ESCAPE:
                     self.pause = not self.pause
 
+            if e.type == MOUSEBUTTONDOWN and self.pause:
+                x, y = e.pos
+                self.pause_menu.check_click(x,y)
+
+            
             if e.type == MOUSEBUTTONDOWN and inventar.is_open:
                 x, y = e.pos
                 selected_item = inventar.select(x, y)
@@ -638,6 +649,9 @@ class GameController:
         if self.game_over:
             self.result.draw(window)
         
+        if self.pause:
+                self.pause_menu.draw(window)
+
         display.update()
         clock.tick(FPS)
 
@@ -652,6 +666,9 @@ class GameController:
         self.read_map()
         return self.level
 
+    def resume(self):
+        self.pause = False
+    
     def run(self):
         while self.running:
             self.events()
@@ -664,6 +681,9 @@ class GameController:
 
                 
             self.draw()
+            
+
+            
 
 game = GameController()
 #game.run()
