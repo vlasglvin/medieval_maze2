@@ -310,9 +310,10 @@ class Player(GameSprite):
             bow_sound.play()
 
     def hit(self):
-        self.hit_image = self.images['player_'+self.dir][self.weapon]
-        self.frame = 0
-        self.image_k = 0
+        if self.weapon:
+            self.hit_image = self.images['player_'+self.dir][self.weapon]
+            self.frame = 0
+            self.image_k = 0
 
     def hit_animate(self): 
         self.frame += 1
@@ -321,7 +322,8 @@ class Player(GameSprite):
             self.image_k += 1
             if self.image_k >= len(self.hit_image):
                 self.hit_image = None
-                arrows.add(Arrow(self.rect, 5, self.dir))
+                if self.weapon == "bow":
+                    arrows.add(Arrow(self.rect, 5, self.dir))
             else:     
                 self.image = self.hit_image[self.image_k]
 
@@ -333,7 +335,7 @@ class Chest(GameSprite):
     def __init__(self,x,y,width,height):
         super().__init__("chest", chest_image,x,y,width,height)
         self.open_image = transform.scale(open_chest_image, (width, height))
-        rand_item = random.choice(list(item_list.keys()))
+        rand_item = random.choice(["bow", "knife", "spear"])
         self.time = time.get_ticks()
         self.item = rand_item
         self.opened = False
@@ -352,7 +354,7 @@ class Chest(GameSprite):
         return self.item
     
     def update(self):
-        if self.opened == True:
+        if self.opened:
             if time.get_ticks() - self.time < 1000:
                 window.blit(item_list[self.item], (self.rect.x + -25,self.rect.top - 5))
 
@@ -652,13 +654,11 @@ class GameController:
         if self.pause:
                 self.pause_menu.draw(window)
 
-        display.update()
-        clock.tick(FPS)
 
     def next_level(self):
         global player    
         self.level += 1
-        if self.level == MAX_LEVEL:
+        if self.level > MAX_LEVEL:
             return 0
         for sprite in sprites:
             sprite.kill()
@@ -672,6 +672,7 @@ class GameController:
     def run(self):
         while self.running:
             self.events()
+            self.draw()
             if not self.game_over and not self.pause:
                 self.update()
             if not player.rect.colliderect(window_rect):
@@ -680,7 +681,8 @@ class GameController:
                     self.game_over = True
 
                 
-            self.draw()
+            display.update()
+            clock.tick(FPS)
             
 
             
