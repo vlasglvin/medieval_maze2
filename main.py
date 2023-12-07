@@ -1,6 +1,7 @@
 from pygame import *
 import os
 import random
+import pickle
 
 from config import *
 from HUD import Inventar, Counter, Label, MainMenu, PauseMenu
@@ -82,16 +83,17 @@ for folder in folders:
         "spear": get_image_list(folder + os.sep + "spear", 50, 50),
     }
 
-enemy_down_img = get_image_list("enemy" + os.sep + "down", 50, 50)
-enemy_left_img = get_image_list("enemy" + os.sep + "left", 50, 50)
-enemy_right_img = get_image_list("enemy" + os.sep + "right", 50, 50)
-enemy_up_img = get_image_list("enemy" + os.sep + "up", 50, 50)
-enemy_killing_img = get_image_list("enemy" + os.sep + "killing", 50, 50)
+enemy_down_img = get_image_list("enemy" + os.sep + "down", 40, 40)
+enemy_left_img = get_image_list("enemy" + os.sep + "left", 40, 40)
+enemy_right_img = get_image_list("enemy" + os.sep + "right", 40, 40)
+enemy_up_img = get_image_list("enemy" + os.sep + "up", 40, 40)
+enemy_killing_img = get_image_list("enemy" + os.sep + "killing", 40, 40)
 item_list = {
     "healing potion" : potion_image, "rage potion" : red_potion_image, "gold bar" : goldbar_image,#"sword" : sword_image,
     "bow" : bow_image, "knife" : knife_image,"spear" : spear_image,"speed potion" : orange_potion_image
 }
 
+chest_item_list = list(item_list.keys())
 
 class GameSprite(sprite.Sprite):
     def __init__(self,type,sprite_image,x,y,width,height):
@@ -335,13 +337,13 @@ class Chest(GameSprite):
     def __init__(self,x,y,width,height):
         super().__init__("chest", chest_image,x,y,width,height)
         self.open_image = transform.scale(open_chest_image, (width, height))
-        rand_item = random.choice(["bow", "knife", "spear"])
         self.time = time.get_ticks()
-        self.item = rand_item
         self.opened = False
     
     def open(self):
         
+        rand_item = random.choice(chest_item_list)
+        self.item = rand_item
         self.opened = True
         self.image = self.open_image
         chest_sound.play()
@@ -350,6 +352,8 @@ class Chest(GameSprite):
             gold_counter.update_value(player.gold)
         else:  
             inventar.add_item(self.item)
+            if self.item in weapon_list:
+                chest_item_list.remove(self.item)
         self.time = time.get_ticks()
         return self.item
     
@@ -537,7 +541,8 @@ class GameController:
     def read_map(self):
         global BG_COLOR
         for group in groups_list:
-            group.empty()
+            for item in group:
+                item.kill()
 
         with open(f"level_{self.level}.txt",'r', encoding="utf-8") as file:
             if self.level == 4:
@@ -683,6 +688,21 @@ class GameController:
                 
             display.update()
             clock.tick(FPS)
+            
+    
+    def save_game(self):
+        with open("save.dat", "wb") as file:
+            pickle.dump(self.level, file)
+            pickle.dump(player.rect.x, file)
+            pickle.dump(player.rect.y, file)
+            pickle.dump(player.speed, file)
+            pickle.dump(player.power, file)
+            pickle.dump(player.gold, file)
+            pickle.dump(player.weapon, file)
+            pickle.dump(player.dir, file)
+            pickle.dump(inventar.items, file)
+
+        self.resume()
             
 
             

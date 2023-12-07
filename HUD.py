@@ -2,11 +2,7 @@ from pygame import *
 font.init()
 
 from config import *
-INV_WIDTH, INV_HEIGHT = 300,300
-ITEM_WIDTH, ITEM_HEIGHT = INV_WIDTH/4, INV_HEIGHT/4
-FONT_PATH = "assets/alagard_by_pix3m-d6awiwp.ttf"
 
-weapon_list = ["bow", "knife", "spear"]
 menu_bg = image.load("assets/shadowed_bg.png")
 menu_btn = image.load("assets/menu_button.png")
 
@@ -122,7 +118,7 @@ class MainMenu(Surface):
         self.game = game
         self.image = transform.scale(menu_bg.convert_alpha(), (width, height))
         self.rect = self.image.get_rect(center=(WIDTH/2, HEIGHT/2))
-        self.bg_color = (45, 117, 64)
+        self.bg_color = (43, 30, 30)
         self.width = width
         self.height = height
         self.main_text = Label("Medieval Maze", WIDTH/2, 150, 100, (133, 77, 32))
@@ -152,7 +148,7 @@ class PauseMenu(MainMenu):
         self.image = transform.scale(menu_bg.convert_alpha(), (width, height))
         self.rect = self.image.get_rect(center=(WIDTH/2, HEIGHT/2))
         self.options = [Button("Resume", self.game.resume, WIDTH/2, 360, width=250, height=60, font_size= 25),
-                        Button("Save Game", self.game.start_game, WIDTH/2, 410,  width=250, height=60, font_size= 25),
+                        Button("Save Game", self.game.save_game, WIDTH/2, 410,  width=250, height=60, font_size= 25),
                         Button("Main Menu", self.game.show_menu, WIDTH/2, 460,  width=250, height=60, font_size= 25)]
         
     def draw(self, window):

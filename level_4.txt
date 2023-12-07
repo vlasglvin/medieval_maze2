@@ -1,16 +1,16 @@
 XXXXXXXXXXXXXXXXXXXXXXXXXXXX
-X      C  E   O            x
-x  www    wwwwwwwwwwwwww   x
-x     www ww       E       x
-x     wCw ww     H    www  x
-x  ww      ww   E      E   x
-x  w     O    w    w  Sc   x
-x  www  E    wwwww     S  Ax
-x  wwC   ww       S   www  E   
-x  w   E       www   S     E   
-x     wwwwwww         S   Ax
-x     wC R                 x
-x     wwwwwww        E     x
-X P    E       E           x
-x     C      H             x           
+X                          x
+x                          x
+x                          x
+x                          x
+x                          x
+x                          x
+x                          x
+x                          x   
+x                          x      
+x                          x
+x                          x
+x                          x
+X                          x
+x                          x           
 XXXXXXXXXXXXXXXXXXXXXXXXXXXX
