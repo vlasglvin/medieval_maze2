@@ -17,7 +17,7 @@ class Inventar(sprite.Sprite):
         self.font = font.Font(FONT_PATH, 35)
     
     def add_item(self, item):
-        if item in self.items and not item not in weapon_list:
+        if item in self.items:
             
             self.items[item] += 1
             if item in weapon_list:
@@ -122,8 +122,8 @@ class MainMenu(Surface):
         self.width = width
         self.height = height
         self.main_text = Label("Medieval Maze", WIDTH/2, 150, 100, (133, 77, 32))
-        self.options = [Button("Play", self.game.start_game, WIDTH/2, 250, width=400, height=93, font_size = 50),
-                        Button("New Game", self.game.start_game, WIDTH/2, 360),
+        self.options = [Button("Play", self.game.load_game, WIDTH/2, 250, width=400, height=93, font_size = 50),
+                        Button("New Game", self.game.new_game, WIDTH/2, 360),
                         Button("About", quit, WIDTH/2, 460),
                         Button("Exit", quit, WIDTH/2, 560)]
 

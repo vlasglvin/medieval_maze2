@@ -481,11 +481,7 @@ display.set_caption("Medieval Game")
 clock  = time.Clock()
 
 
-player  = Player(player_images, 100, 100, 50, 50, 4 ,100)
-inventar = Inventar()
-hp_counter = Counter(player.hp, heart_image, 35,35,WIDTH - 150,HEIGHT - 40)
-gold_counter = Counter(player.gold, goldbar_image, 35,35,WIDTH - 270,HEIGHT - 40)
-power_counter = Counter(player.power, power_sign, 35,35, WIDTH - 380, HEIGHT - 40)
+
 
 level = "level_1.txt"
 
@@ -508,17 +504,70 @@ class GameController:
         mixer.music.play()
         self.run_menu()
 
+    def new_game(self):
+        global player, inventar, hp_counter, gold_counter, power_counter
+        for item in sprites:
+                item.kill()
+        player  = Player(player_images, 100, 100, 50, 50, 4 ,100)
+        inventar = Inventar()
+        hp_counter = Counter(player.hp, heart_image, 35,35,WIDTH - 150,HEIGHT - 40)
+        gold_counter = Counter(player.gold, goldbar_image, 35,35,WIDTH - 270,HEIGHT - 40)
+        power_counter = Counter(player.power, power_sign, 35,35, WIDTH - 380, HEIGHT - 40)
+        self.level = 1
+        self.read_map()
+        self.start_game()
+
     def start_game(self):
+        
         mixer.music.load("assets/audio/Loop_Minstrel_Dance.wav")
         mixer_music.set_volume(0.2)
         mixer.music.play()
-        self.read_map()
         self.running = True
         self.pause = False
         self.run()
 
-    
-    
+    def save_game(self):
+        with open("save.dat", "wb") as file:
+            pickle.dump(self.level, file)
+            pickle.dump(player.rect.x, file)
+            pickle.dump(player.rect.y, file)
+            pickle.dump(player.speed, file)
+            pickle.dump(player.power, file)
+            pickle.dump(player.gold, file)
+            pickle.dump(player.weapon, file)
+            pickle.dump(player.dir, file)
+            pickle.dump(inventar.items, file)
+
+        self.resume()
+
+    def load_game(self):
+        global player, inventar, hp_counter, gold_counter, power_counter
+        
+        for item in sprites:
+                item.kill()
+        
+        player  = Player(player_images, 100, 100, 50, 50, 4 ,100)
+        inventar = Inventar()
+        
+        
+
+        with open("save.dat", "rb") as file:
+            self.level = pickle.load(file)
+            self.read_map()
+            player.rect.x = pickle.load(file)
+            player.rect.y = pickle.load(file)
+            player.speed = pickle.load(file)
+            player.power = pickle.load(file)
+            player.gold = pickle.load(file)
+            player.weapon = pickle.load(file)
+            player.dir = pickle.load(file)
+            inventar.items = pickle.load(file)
+        
+        hp_counter = Counter(player.hp, heart_image, 35,35,WIDTH - 150,HEIGHT - 40)
+        gold_counter = Counter(player.gold, goldbar_image, 35,35,WIDTH - 270,HEIGHT - 40)
+        power_counter = Counter(player.power, power_sign, 35,35, WIDTH - 380, HEIGHT - 40)
+
+        self.start_game()
     
     def run_menu(self):
         
@@ -540,9 +589,6 @@ class GameController:
 
     def read_map(self):
         global BG_COLOR
-        for group in groups_list:
-            for item in group:
-                item.kill()
 
         with open(f"level_{self.level}.txt",'r', encoding="utf-8") as file:
             if self.level == 4:
@@ -689,23 +735,7 @@ class GameController:
             display.update()
             clock.tick(FPS)
             
-    
-    def save_game(self):
-        with open("save.dat", "wb") as file:
-            pickle.dump(self.level, file)
-            pickle.dump(player.rect.x, file)
-            pickle.dump(player.rect.y, file)
-            pickle.dump(player.speed, file)
-            pickle.dump(player.power, file)
-            pickle.dump(player.gold, file)
-            pickle.dump(player.weapon, file)
-            pickle.dump(player.dir, file)
-            pickle.dump(inventar.items, file)
-
-        self.resume()
-            
-
-            
+         
 
 game = GameController()
 #game.run()
