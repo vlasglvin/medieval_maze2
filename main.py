@@ -534,11 +534,76 @@ class GameController:
             pickle.dump(player.speed, file)
             pickle.dump(player.power, file)
             pickle.dump(player.gold, file)
+            pickle.dump(player.hp, file)
             pickle.dump(player.weapon, file)
             pickle.dump(player.dir, file)
             pickle.dump(inventar.items, file)
 
+            pickle.dump(len(enemys), file)
+            for enemy in enemys:
+                pickle.dump(enemy.hp, file)
+                pickle.dump(enemy.dir, file)
+                pickle.dump(enemy.rect.x, file)
+                pickle.dump(enemy.rect.y, file)
+        
+        
         self.resume()
+
+    def load_map(self):
+        global BG_COLOR
+
+        with open(f"level_{self.level}.txt",'r', encoding="utf-8") as file:
+            if self.level == 4:
+                BG_COLOR = (34, 36, 34)
+                mixer.music.load("assets/Overture.ogg")
+                mixer.music.play()
+
+            x, y = 25, 25
+            map = file.readlines()
+            for line in map:
+                for symbol in line:
+                    if symbol == "X":
+                        walls.add(GameSprite("fence",fence_image , x,y, 50,25))
+
+                    if symbol == "H":
+                        potions.add(GameSprite("healing potion",potion_image , x,y, 20,20))
+
+                    if symbol == "x":
+                        walls.add(GameSprite("flip fence",left_fence_image , x,y, 25,50))
+
+                    if symbol == "w":
+                        walls.add(GameSprite("wall",wall_image , x,y, 50,50))
+
+                    if symbol == "S":
+                        new_spike = GameSprite("spike",spike_image , x,y, 35,35)
+                        spikes.add(new_spike)
+                        walls.add(new_spike)
+
+                    if symbol == "C":
+                        chests.add(Chest(x,y, 30,30,))
+
+                    if symbol == "R":
+                        potions.add(GameSprite("rage potion",red_potion_image , x,y, 20,20))
+
+                    if symbol == "O":
+                        potions.add(GameSprite("speed potion",orange_potion_image , x,y, 20,20))
+
+                    if symbol == "G":
+                        gold_bars.add(GameSprite("gold bar",goldbar_image , x,y, 30,30))
+
+                    # if symbol == "S":
+                    #     swords.add(GameSprite("sword",sword_image , x,y, 30,30))
+
+                    if symbol == "A":
+                        walls.add(GameSprite("arrow",right_arrow_image , x,y, 50,50))
+
+                    if symbol == "a":
+                        walls.add(GameSprite("arrow",left_arrow_image , x,y, 50,50))
+
+                    x += 50
+
+                x = 25
+                y += 50
 
     def load_game(self):
         global player, inventar, hp_counter, gold_counter, power_counter
@@ -553,19 +618,30 @@ class GameController:
 
         with open("save.dat", "rb") as file:
             self.level = pickle.load(file)
-            self.read_map()
+            self.load_map()
             player.rect.x = pickle.load(file)
             player.rect.y = pickle.load(file)
             player.speed = pickle.load(file)
             player.power = pickle.load(file)
             player.gold = pickle.load(file)
+            player.hp = pickle.load(file)
             player.weapon = pickle.load(file)
             player.dir = pickle.load(file)
             inventar.items = pickle.load(file)
         
-        hp_counter = Counter(player.hp, heart_image, 35,35,WIDTH - 150,HEIGHT - 40)
-        gold_counter = Counter(player.gold, goldbar_image, 35,35,WIDTH - 270,HEIGHT - 40)
-        power_counter = Counter(player.power, power_sign, 35,35, WIDTH - 380, HEIGHT - 40)
+            hp_counter = Counter(player.hp, heart_image, 35,35,WIDTH - 150,HEIGHT - 40)
+            gold_counter = Counter(player.gold, goldbar_image, 35,35,WIDTH - 270,HEIGHT - 40)
+            power_counter = Counter(player.power, power_sign, 35,35, WIDTH - 380, HEIGHT - 40)
+
+            k_enemys = pickle.load(file)
+            for i in range(k_enemys):
+                hp = pickle.load(file)
+                e_dir = pickle.load(file)
+                x = pickle.load(file)
+                y = pickle.load(file)
+                new_enemy = Enemy(x, y, 40,40,1 ,20)
+                new_enemy.dir = e_dir
+                enemys.add(new_enemy)
 
         self.start_game()
     
@@ -711,9 +787,10 @@ class GameController:
         self.level += 1
         if self.level > MAX_LEVEL:
             return 0
-        for sprite in sprites:
-            sprite.kill()
-        player  = Player(player_images, 100, 100, 50, 50, 4 ,100)
+        for gamesprite in sprites:
+            if gamesprite.type != "player":
+                gamesprite.kill()
+        #player  = Player(player_images, 100, 100, 50, 50, 4 ,100)
         self.read_map()
         return self.level
 

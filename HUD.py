@@ -67,7 +67,7 @@ class Counter():
         self.image = transform.scale(image, (width, height))
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = x,y
-        self.label = self.font.render(str(value), True, (255, 255, 255))
+        self.label = self.font.render(str(round(value)), True, (255, 255, 255))
         self.width, self.height = width, height
 
     def draw(self, window):
