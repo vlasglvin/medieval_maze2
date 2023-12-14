@@ -83,7 +83,7 @@ class Counter():
 class Label:
     def __init__(self, text, x ,y,font_size = 30, color = (255, 255, 255)):
         self.font = font.Font(FONT_PATH, font_size)
-        self.image = self.font.render(text, True, color)
+        self.image = self.font.render(str(text), True, color)
         self.rect = self.image.get_rect()
         self.rect.centerx, self.rect.centery = x, y
         self.color = color
@@ -92,7 +92,7 @@ class Label:
         window.blit(self.image, self.rect)
     
     def set_text(self, new_text):
-        self.image = self.font.render(new_text, True, self.color)
+        self.image = self.font.render(str(new_text), True, self.color)
 
 class Button(sprite.Sprite):
     def __init__(self, text, action, x, y, width=298, height=71, font_size = 30):

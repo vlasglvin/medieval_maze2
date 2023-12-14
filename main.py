@@ -339,7 +339,8 @@ class Chest(GameSprite):
         self.open_image = transform.scale(open_chest_image, (width, height))
         self.time = time.get_ticks()
         self.opened = False
-    
+        self.item = None
+
     def open(self):
         
         rand_item = random.choice(chest_item_list)
@@ -358,7 +359,7 @@ class Chest(GameSprite):
         return self.item
     
     def update(self):
-        if self.opened:
+        if self.opened and self.item:
             if time.get_ticks() - self.time < 1000:
                 window.blit(item_list[self.item], (self.rect.x + -25,self.rect.top - 5))
 
@@ -513,6 +514,8 @@ class GameController:
         hp_counter = Counter(player.hp, heart_image, 35,35,WIDTH - 150,HEIGHT - 40)
         gold_counter = Counter(player.gold, goldbar_image, 35,35,WIDTH - 270,HEIGHT - 40)
         power_counter = Counter(player.power, power_sign, 35,35, WIDTH - 380, HEIGHT - 40)
+        self.level_counter = Label(self.level, 20, HEIGHT - 40)
+        
         self.level = 1
         self.read_map()
         self.start_game()
@@ -543,9 +546,25 @@ class GameController:
             for enemy in enemys:
                 pickle.dump(enemy.hp, file)
                 pickle.dump(enemy.dir, file)
-                pickle.dump(enemy.rect.x, file)
-                pickle.dump(enemy.rect.y, file)
-        
+                pickle.dump(enemy.rect.centerx, file)
+                pickle.dump(enemy.rect.centery, file)
+
+            pickle.dump(len(potions), file)
+            for potion in potions:
+                pickle.dump(potion.type, file)
+                pickle.dump(potion.rect.centerx, file)
+                pickle.dump(potion.rect.centery, file)
+
+            pickle.dump(len(gold_bars), file)
+            for gold_bar in gold_bars:
+                pickle.dump(gold_bar.rect.centerx, file)
+                pickle.dump(gold_bar.rect.centery, file)
+            
+            pickle.dump(len(chests), file)
+            for chest in chests:
+                pickle.dump(chest.rect.centerx, file)
+                pickle.dump(chest.rect.centery, file)
+                pickle.dump(chest.opened, file)
         
         self.resume()
 
@@ -565,9 +584,6 @@ class GameController:
                     if symbol == "X":
                         walls.add(GameSprite("fence",fence_image , x,y, 50,25))
 
-                    if symbol == "H":
-                        potions.add(GameSprite("healing potion",potion_image , x,y, 20,20))
-
                     if symbol == "x":
                         walls.add(GameSprite("flip fence",left_fence_image , x,y, 25,50))
 
@@ -579,20 +595,6 @@ class GameController:
                         spikes.add(new_spike)
                         walls.add(new_spike)
 
-                    if symbol == "C":
-                        chests.add(Chest(x,y, 30,30,))
-
-                    if symbol == "R":
-                        potions.add(GameSprite("rage potion",red_potion_image , x,y, 20,20))
-
-                    if symbol == "O":
-                        potions.add(GameSprite("speed potion",orange_potion_image , x,y, 20,20))
-
-                    if symbol == "G":
-                        gold_bars.add(GameSprite("gold bar",goldbar_image , x,y, 30,30))
-
-                    # if symbol == "S":
-                    #     swords.add(GameSprite("sword",sword_image , x,y, 30,30))
 
                     if symbol == "A":
                         walls.add(GameSprite("arrow",right_arrow_image , x,y, 50,50))
@@ -642,6 +644,37 @@ class GameController:
                 new_enemy = Enemy(x, y, 40,40,1 ,20)
                 new_enemy.dir = e_dir
                 enemys.add(new_enemy)
+
+            k_potions = pickle.load(file)
+            for i in range(k_potions):
+                potion_type = pickle.load(file)
+                x = pickle.load(file)
+                y = pickle.load(file)
+                if potion_type == "healing potion":
+                    potions.add(GameSprite("healing potion",potion_image , x,y, 20,20))
+                if potion_type == "rage potion":
+                        potions.add(GameSprite("rage potion",red_potion_image , x,y, 20,20))
+                if potion_type == "speed potion":
+                        potions.add(GameSprite("speed potion",orange_potion_image , x,y, 20,20))
+
+            k_gold_bars = pickle.load(file)
+            for i in range(k_gold_bars):
+                x = pickle.load(file)
+                y = pickle.load(file)
+                gold_bars.add(GameSprite("gold bar",goldbar_image , x,y, 30,30))
+
+            k_chests = pickle.load(file)
+            for i in range(k_chests):
+                x = pickle.load(file)
+                y = pickle.load(file)
+                opened = pickle.load(file)
+                chest = Chest(x,y, 30,30,)
+                chest.opened = opened
+                if chest.opened:
+                    chest.image = chest.open_image
+                    
+                chests.add(chest)
+
 
         self.start_game()
     
@@ -774,7 +807,8 @@ class GameController:
         hp_counter.draw(window)
         gold_counter.draw(window)
         power_counter.draw(window)
-        
+        self.level_counter.draw(window)
+
         if self.game_over:
             self.result.draw(window)
         
