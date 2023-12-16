@@ -12,7 +12,7 @@ font.init()
 mixer.init()
 tunnel_steps = mixer.Sound("assets/audio/steps in wood floor.wav")
 grass_steps = mixer.Sound("assets/audio/leaves01.ogg")
-tunnel_steps.set_volume(0.1)
+tunnel_steps.set_volume(1)
 grass_steps.set_volume(0.5)
 guy_dying = mixer.Sound("assets/dying_guy.ogg")
 enemy_damaging_sound = mixer.Sound("assets/audio/ogre5.wav")
@@ -532,8 +532,15 @@ class GameController:
         self.start_game()
 
     def start_game(self):
-        
-        mixer.music.load("assets/audio/Loop_Minstrel_Dance.wav")
+        global BG_COLOR
+        if self.level == 4:
+            BG_COLOR = (34, 36, 34)
+            mixer.music.load("assets/Overture.ogg")
+            player.step_sound = tunnel_steps
+
+        else:
+
+            mixer.music.load("assets/audio/Loop_Minstrel_Dance.wav")
         mixer_music.set_volume(0.2)
         mixer.music.play()
         self.level_counter = Label(f"Level: {self.level}", 70, HEIGHT - 25, 35)
@@ -710,13 +717,14 @@ class GameController:
 
     def read_map(self):
         global BG_COLOR
-
+        if self.level == 4:
+            BG_COLOR = (34, 36, 34)
+            mixer.music.load("assets/Overture.ogg")
+            player.step_sound.stop()
+            player.step_sound = tunnel_steps
+            mixer.music.play()
         with open(f"level_{self.level}.txt",'r', encoding="utf-8") as file:
-            if self.level == 4:
-                BG_COLOR = (34, 36, 34)
-                mixer.music.load("assets/Overture.ogg")
-                mixer.music.play()
-
+            
             x, y = 25, 25
             map = file.readlines()
             for line in map:
