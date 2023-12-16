@@ -10,6 +10,10 @@ init()
 
 font.init()
 mixer.init()
+tunnel_steps = mixer.Sound("assets/audio/steps in wood floor.wav")
+grass_steps = mixer.Sound("assets/audio/leaves01.ogg")
+tunnel_steps.set_volume(0.1)
+grass_steps.set_volume(0.5)
 guy_dying = mixer.Sound("assets/dying_guy.ogg")
 enemy_damaging_sound = mixer.Sound("assets/audio/ogre5.wav")
 potion_sound = mixer.Sound("assets/audio/bottle.wav")
@@ -139,6 +143,9 @@ class Player(GameSprite):
         self.speed_boosted = False
         self.speed_boosted_timer = 0
         self.old_speed = speed
+        self.step_sound = grass_steps
+        
+
 
     def animate(self):
         self.frame += 1
@@ -228,6 +235,10 @@ class Player(GameSprite):
 
         if self.state != "stop" and not self.hit_image:
             self.animate()
+            if self.step_sound.get_num_channels() == 0:
+                self.step_sound.play(loops=-1)
+        else:
+            self.step_sound.stop()
         
         if self.check_collision():
             self.rect.x,self.rect.y = old_pos
@@ -525,10 +536,11 @@ class GameController:
         mixer.music.load("assets/audio/Loop_Minstrel_Dance.wav")
         mixer_music.set_volume(0.2)
         mixer.music.play()
+        self.level_counter = Label(f"Level: {self.level}", 70, HEIGHT - 25, 35)
         self.running = True
         self.pause = False
         self.run()
-
+        
     def save_game(self):
         with open("save.dat", "wb") as file:
             pickle.dump(self.level, file)
@@ -819,6 +831,7 @@ class GameController:
     def next_level(self):
         global player    
         self.level += 1
+        self.level_counter.set_text(f"Level: {self.level}")
         if self.level > MAX_LEVEL:
             return 0
         for gamesprite in sprites:

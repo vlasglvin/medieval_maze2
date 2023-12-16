@@ -44,7 +44,7 @@ class Inventar(sprite.Sprite):
                 if x >= INV_HEIGHT:
                     y += ITEM_HEIGHT
                     x = 0
-            window.blit(self.surface, (0,500))
+            window.blit(self.surface, (0,490))
 
     def select(self, x, y):
         if self.is_open == True:
