@@ -155,3 +155,10 @@ class PauseMenu(MainMenu):
         window.blit(self.image, self.rect)
         for btn in self.options:
             btn.draw(window)
+
+
+class AboutMenu(MainMenu):
+    def __init__(self, width, height, game):
+        super().__init__(width, height, game)
+        self.options = [Button("Back to main menu", self.game.resume, WIDTH/2, 360, width=250, height=60, font_size= 25)]
+        self.text = Label("ABOUT_TEXT", WIDTH/2, 350, 30, (255, 255, 255))

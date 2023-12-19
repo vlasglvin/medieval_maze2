@@ -511,6 +511,7 @@ class GameController:
 
     
     def show_menu(self):
+        mixer.stop()
         mixer.music.load("assets/audio/Woodland Fantasy.mp3")
         mixer_music.set_volume(0.2)
         mixer.music.play()
@@ -532,6 +533,7 @@ class GameController:
         self.start_game()
 
     def start_game(self):
+        mixer.stop()
         global BG_COLOR
         if self.level == 4:
             BG_COLOR = (34, 36, 34)
@@ -539,53 +541,55 @@ class GameController:
             player.step_sound = tunnel_steps
 
         else:
-
+            BG_COLOR = (129, 161, 0)
             mixer.music.load("assets/audio/Loop_Minstrel_Dance.wav")
         mixer_music.set_volume(0.2)
         mixer.music.play()
         self.level_counter = Label(f"Level: {self.level}", 70, HEIGHT - 25, 35)
+        self.game_over = False
         self.running = True
         self.pause = False
         self.run()
         
     def save_game(self):
-        with open("save.dat", "wb") as file:
-            pickle.dump(self.level, file)
-            pickle.dump(player.rect.x, file)
-            pickle.dump(player.rect.y, file)
-            pickle.dump(player.speed, file)
-            pickle.dump(player.power, file)
-            pickle.dump(player.gold, file)
-            pickle.dump(player.hp, file)
-            pickle.dump(player.weapon, file)
-            pickle.dump(player.dir, file)
-            pickle.dump(inventar.items, file)
+        if not self.game_over:
+            with open("save.dat", "wb") as file:
+                pickle.dump(self.level, file)
+                pickle.dump(player.rect.x, file)
+                pickle.dump(player.rect.y, file)
+                pickle.dump(player.speed, file)
+                pickle.dump(player.power, file)
+                pickle.dump(player.gold, file)
+                pickle.dump(player.hp, file)
+                pickle.dump(player.weapon, file)
+                pickle.dump(player.dir, file)
+                pickle.dump(inventar.items, file)
 
-            pickle.dump(len(enemys), file)
-            for enemy in enemys:
-                pickle.dump(enemy.hp, file)
-                pickle.dump(enemy.dir, file)
-                pickle.dump(enemy.rect.centerx, file)
-                pickle.dump(enemy.rect.centery, file)
+                pickle.dump(len(enemys), file)
+                for enemy in enemys:
+                    pickle.dump(enemy.hp, file)
+                    pickle.dump(enemy.dir, file)
+                    pickle.dump(enemy.rect.centerx, file)
+                    pickle.dump(enemy.rect.centery, file)
 
-            pickle.dump(len(potions), file)
-            for potion in potions:
-                pickle.dump(potion.type, file)
-                pickle.dump(potion.rect.centerx, file)
-                pickle.dump(potion.rect.centery, file)
+                pickle.dump(len(potions), file)
+                for potion in potions:
+                    pickle.dump(potion.type, file)
+                    pickle.dump(potion.rect.centerx, file)
+                    pickle.dump(potion.rect.centery, file)
 
-            pickle.dump(len(gold_bars), file)
-            for gold_bar in gold_bars:
-                pickle.dump(gold_bar.rect.centerx, file)
-                pickle.dump(gold_bar.rect.centery, file)
+                pickle.dump(len(gold_bars), file)
+                for gold_bar in gold_bars:
+                    pickle.dump(gold_bar.rect.centerx, file)
+                    pickle.dump(gold_bar.rect.centery, file)
+                
+                pickle.dump(len(chests), file)
+                for chest in chests:
+                    pickle.dump(chest.rect.centerx, file)
+                    pickle.dump(chest.rect.centery, file)
+                    pickle.dump(chest.opened, file)
             
-            pickle.dump(len(chests), file)
-            for chest in chests:
-                pickle.dump(chest.rect.centerx, file)
-                pickle.dump(chest.rect.centery, file)
-                pickle.dump(chest.opened, file)
-        
-        self.resume()
+            self.resume()
 
     def load_map(self):
         global BG_COLOR
@@ -635,67 +639,71 @@ class GameController:
         player  = Player(player_images, 100, 100, 50, 50, 4 ,100)
         inventar = Inventar()
         
-        
+        if self.game_over:
+            self.new_game()
+            return
+        try:
+            with open("save.dat", "rb") as file:
+                self.level = pickle.load(file)
+                self.load_map()
+                player.rect.x = pickle.load(file)
+                player.rect.y = pickle.load(file)
+                player.speed = pickle.load(file)
+                player.power = pickle.load(file)
+                player.gold = pickle.load(file)
+                player.hp = pickle.load(file)
+                player.weapon = pickle.load(file)
+                player.dir = pickle.load(file)
+                inventar.items = pickle.load(file)
+            
+                hp_counter = Counter(player.hp, heart_image, 35,35,WIDTH - 150,HEIGHT - 40)
+                gold_counter = Counter(player.gold, goldbar_image, 35,35,WIDTH - 270,HEIGHT - 40)
+                power_counter = Counter(player.power, power_sign, 35,35, WIDTH - 380, HEIGHT - 40)
 
-        with open("save.dat", "rb") as file:
-            self.level = pickle.load(file)
-            self.load_map()
-            player.rect.x = pickle.load(file)
-            player.rect.y = pickle.load(file)
-            player.speed = pickle.load(file)
-            player.power = pickle.load(file)
-            player.gold = pickle.load(file)
-            player.hp = pickle.load(file)
-            player.weapon = pickle.load(file)
-            player.dir = pickle.load(file)
-            inventar.items = pickle.load(file)
-        
-            hp_counter = Counter(player.hp, heart_image, 35,35,WIDTH - 150,HEIGHT - 40)
-            gold_counter = Counter(player.gold, goldbar_image, 35,35,WIDTH - 270,HEIGHT - 40)
-            power_counter = Counter(player.power, power_sign, 35,35, WIDTH - 380, HEIGHT - 40)
+                k_enemys = pickle.load(file)
+                for i in range(k_enemys):
+                    hp = pickle.load(file)
+                    e_dir = pickle.load(file)
+                    x = pickle.load(file)
+                    y = pickle.load(file)
+                    new_enemy = Enemy(x, y, 40,40,1 ,20)
+                    new_enemy.dir = e_dir
+                    enemys.add(new_enemy)
 
-            k_enemys = pickle.load(file)
-            for i in range(k_enemys):
-                hp = pickle.load(file)
-                e_dir = pickle.load(file)
-                x = pickle.load(file)
-                y = pickle.load(file)
-                new_enemy = Enemy(x, y, 40,40,1 ,20)
-                new_enemy.dir = e_dir
-                enemys.add(new_enemy)
+                k_potions = pickle.load(file)
+                for i in range(k_potions):
+                    potion_type = pickle.load(file)
+                    x = pickle.load(file)
+                    y = pickle.load(file)
+                    if potion_type == "healing potion":
+                        potions.add(GameSprite("healing potion",potion_image , x,y, 20,20))
+                    if potion_type == "rage potion":
+                            potions.add(GameSprite("rage potion",red_potion_image , x,y, 20,20))
+                    if potion_type == "speed potion":
+                            potions.add(GameSprite("speed potion",orange_potion_image , x,y, 20,20))
 
-            k_potions = pickle.load(file)
-            for i in range(k_potions):
-                potion_type = pickle.load(file)
-                x = pickle.load(file)
-                y = pickle.load(file)
-                if potion_type == "healing potion":
-                    potions.add(GameSprite("healing potion",potion_image , x,y, 20,20))
-                if potion_type == "rage potion":
-                        potions.add(GameSprite("rage potion",red_potion_image , x,y, 20,20))
-                if potion_type == "speed potion":
-                        potions.add(GameSprite("speed potion",orange_potion_image , x,y, 20,20))
+                k_gold_bars = pickle.load(file)
+                for i in range(k_gold_bars):
+                    x = pickle.load(file)
+                    y = pickle.load(file)
+                    gold_bars.add(GameSprite("gold bar",goldbar_image , x,y, 30,30))
 
-            k_gold_bars = pickle.load(file)
-            for i in range(k_gold_bars):
-                x = pickle.load(file)
-                y = pickle.load(file)
-                gold_bars.add(GameSprite("gold bar",goldbar_image , x,y, 30,30))
-
-            k_chests = pickle.load(file)
-            for i in range(k_chests):
-                x = pickle.load(file)
-                y = pickle.load(file)
-                opened = pickle.load(file)
-                chest = Chest(x,y, 30,30,)
-                chest.opened = opened
-                if chest.opened:
-                    chest.image = chest.open_image
-                    
-                chests.add(chest)
+                k_chests = pickle.load(file)
+                for i in range(k_chests):
+                    x = pickle.load(file)
+                    y = pickle.load(file)
+                    opened = pickle.load(file)
+                    chest = Chest(x,y, 30,30,)
+                    chest.opened = opened
+                    if chest.opened:
+                        chest.image = chest.open_image
+                        
+                    chests.add(chest)
 
 
-        self.start_game()
+            self.start_game()
+        except:
+            self.new_game()
     
     def run_menu(self):
         
@@ -794,6 +802,8 @@ class GameController:
                     player.hit()
 
                 if e.key == K_ESCAPE:
+                    if self.game_over:
+                        self.show_menu()
                     self.pause = not self.pause
 
             if e.type == MOUSEBUTTONDOWN and self.pause:
@@ -812,6 +822,7 @@ class GameController:
 
     def update(self):
         if player.hp <= 0:
+            self.result.set_text("GAME OVER")
             self.game_over = True
         sprites.update()
         inventar.update()
@@ -841,6 +852,7 @@ class GameController:
         self.level += 1
         self.level_counter.set_text(f"Level: {self.level}")
         if self.level > MAX_LEVEL:
+            self.level = MAX_LEVEL
             return 0
         for gamesprite in sprites:
             if gamesprite.type != "player":
@@ -859,7 +871,7 @@ class GameController:
             if not self.game_over and not self.pause:
                 self.update()
             if not player.rect.colliderect(window_rect):
-                if not self.next_level():
+                if not self.next_level() and not self.game_over:
                     self.result.set_text("YOU WIN")
                     self.game_over = True
 
