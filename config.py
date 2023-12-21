@@ -15,8 +15,4 @@ FONT_PATH = "assets/alagard_by_pix3m-d6awiwp.ttf"
 weapon_list = ["bow", "knife", "spear"]
 
 
-ABOUT_TEXT = '''This game was created by Vlasik and Vova
-Credits too allagart for font:allagart:
-(https://www.deviantart.com/pix3m/art/Bitmap-font-Alagard-381110713)
 
-'''

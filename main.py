@@ -1,15 +1,17 @@
 from pygame import *
-import os
+import os,sys
 import random
 import pickle
 
-from config import *
-from HUD import Inventar, Counter, Label, MainMenu, PauseMenu
 
 init()
 
 font.init()
 mixer.init()
+
+from config import *
+from HUD import Inventar, Counter, Label, MainMenu, PauseMenu, AboutMenu
+
 tunnel_steps = mixer.Sound("assets/audio/steps in wood floor.wav")
 grass_steps = mixer.Sound("assets/audio/leaves01.ogg")
 tunnel_steps.set_volume(1)
@@ -506,6 +508,7 @@ class GameController:
         self.result = Label("GAME OVER", WIDTH/2, HEIGHT/2, 100, RED)
         self.menu = MainMenu(WIDTH, HEIGHT, self)
         self.pause_menu = PauseMenu(WIDTH/3, HEIGHT/3, self)
+        self.about_menu = AboutMenu(WIDTH, HEIGHT, self)
         self.show_menu()
         #self.read_map()
 
@@ -716,11 +719,30 @@ class GameController:
                     x, y = e.pos
                     click = self.menu.check_click(x, y)
                     if click:
-                        quit()
+                        return
             
             self.menu.draw(window)
             display.update()
             clock.tick(FPS)
+
+    def run_about_menu(self):
+         
+        while self.running:
+            for e in event.get():
+                if e.type == QUIT:
+                    self.running = False
+
+                if e.type == MOUSEBUTTONDOWN:
+                    x, y = e.pos
+                    click = self.about_menu.check_click(x, y)
+                    if click:
+                        quit()
+                        
+            
+            self.about_menu.draw(window)
+            display.update()
+            clock.tick(FPS)
+
 
 
     def read_map(self):
@@ -879,7 +901,9 @@ class GameController:
             display.update()
             clock.tick(FPS)
             
-         
+    def exit(self):
+        quit()
+        sys.exit()
 
 game = GameController()
 #game.run()

@@ -1,4 +1,5 @@
 from pygame import *
+init()
 font.init()
 
 from config import *
@@ -124,8 +125,8 @@ class MainMenu(Surface):
         self.main_text = Label("Medieval Maze", WIDTH/2, 150, 100, (133, 77, 32))
         self.options = [Button("Play", self.game.load_game, WIDTH/2, 250, width=400, height=93, font_size = 50),
                         Button("New Game", self.game.new_game, WIDTH/2, 360),
-                        Button("About", quit, WIDTH/2, 460),
-                        Button("Exit", quit, WIDTH/2, 560)]
+                        Button("About", self.game.run_about_menu, WIDTH/2, 460),
+                        Button("Exit", self.game.exit, WIDTH/2, 560)]
 
     def draw(self, window):
         self.fill(self.bg_color)
@@ -160,5 +161,13 @@ class PauseMenu(MainMenu):
 class AboutMenu(MainMenu):
     def __init__(self, width, height, game):
         super().__init__(width, height, game)
-        self.options = [Button("Back to main menu", self.game.resume, WIDTH/2, 360, width=250, height=60, font_size= 25)]
-        self.text = Label("ABOUT_TEXT", WIDTH/2, 350, 30, (255, 255, 255))
+        self.options = [Button("Back to main menu", self.game.show_menu, WIDTH/2, 560, width=350, height=100, font_size= 25)]
+        self.text1 = Label("This game was created by Vlasik and Vova", WIDTH/2, 250, 30, (87, 70, 53))
+        self.text2 = Label("Credits too allagart for font:", WIDTH/2, 350, 30, (87, 70, 53))
+        self.text3 = Label("allagart:(https://www.deviantart.com/pix3m/art/Bitmap-font-Alagard-381110713)", WIDTH/2, 450, 30, (87, 70, 53))
+
+    def draw(self,window):
+        super().draw(window)
+        self.text1.draw(window)
+        self.text2.draw(window)
+        self.text3.draw(window)
