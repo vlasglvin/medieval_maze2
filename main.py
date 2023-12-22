@@ -705,7 +705,7 @@ class GameController:
 
 
             self.start_game()
-        except:
+        except OSError as e:
             self.new_game()
     
     def run_menu(self):
@@ -713,7 +713,7 @@ class GameController:
         while self.running:
             for e in event.get():
                 if e.type == QUIT:
-                    self.running = False
+                    self.exit()
 
                 if e.type == MOUSEBUTTONDOWN:
                     x, y = e.pos
@@ -730,7 +730,7 @@ class GameController:
         while self.running:
             for e in event.get():
                 if e.type == QUIT:
-                    self.running = False
+                    self.exit()
 
                 if e.type == MOUSEBUTTONDOWN:
                     x, y = e.pos
@@ -812,7 +812,7 @@ class GameController:
     def events(self):
         for e in event.get():
             if e.type == QUIT:
-                self.running = False
+                self.exit()
             if e.type == KEYDOWN:
                 if e.key == K_e:
                     if not inventar.is_open == True and not self.pause:
@@ -886,6 +886,8 @@ class GameController:
     def resume(self):
         self.pause = False
     
+    
+    
     def run(self):
         while self.running:
             self.events()
@@ -900,9 +902,9 @@ class GameController:
                 
             display.update()
             clock.tick(FPS)
-            
+           
     def exit(self):
-        quit()
+        self.running = False
         sys.exit()
 
 game = GameController()
