@@ -719,7 +719,7 @@ class GameController:
                     x, y = e.pos
                     click = self.menu.check_click(x, y)
                     if click:
-                        return
+                        quit()
             
             self.menu.draw(window)
             display.update()
